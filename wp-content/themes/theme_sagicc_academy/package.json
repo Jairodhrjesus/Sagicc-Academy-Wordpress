@@ -1,0 +1,13 @@
+{
+  "name": "theme_sagicc_academy",
+  "version": "1.0.0",
+  "description": "Custom theme for Sagicc Academy with Tailwind CSS",
+  "main": "index.php",
+  "scripts": {
+    "build": "tailwindcss -i ./src/input.css -o ./assets/css/tailwind-build.css",
+    "watch": "tailwindcss -i ./src/input.css -o ./assets/css/tailwind-build.css --watch"
+  },
+  "devDependencies": {
+    "tailwindcss": "^3.4.1"
+  }
+}
