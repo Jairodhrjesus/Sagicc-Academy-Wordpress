@@ -1,0 +1,1755 @@
+/* --- RESET Y VARIABLES GLOBALES --- */
+:root {
+  --whatsapp-color: #25D366;
+  --instagram-color: #E4405F;
+  --facebook-color: #1877F2;
+  --telegram-color: #26A5E4;
+  --twitter-color: #1DA1F2;
+  
+  --primary-color: #2a6df5; /* Un azul neutral y tecnológico */
+  --primary-dark: #1a5cde;
+  --secondary-color: #075E54; /* Mantenemos un verde oscuro como secundario */
+  
+  --background-light: #F0F2F5;
+  --background-super-light: #FFFFFF;
+  --text-dark: #111b21;
+  --text-light: #667781;
+  --text-color: #111b21;
+  --background-color: #F0F2F5;
+  --border-color: #e9edef;
+  --font-primary: 'Poppins', sans-serif;
+  --font-secondary: 'Poppins', sans-serif;
+  --font-mono: 'Courier New', monospace;
+  --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+  --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+  --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+  --radius-md: 12px;
+  --radius-lg: 20px;
+}
+
+* { margin: 0; padding: 0; box-sizing: border-box; }
+html { scroll-behavior: smooth; }
+body {
+  font-family: var(--font-primary);
+  line-height: 1.6;
+  color: var(--text-color);
+  background-color: var(--background-color);
+  margin: 0;
+  padding: 0;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+body, input, textarea, button, select {
+  font-family: 'Poppins', sans-serif;
+}
+
+h1, h2, h3, h4, h5, h6,
+.hero-section h1,
+.section-title h2,
+.faq-question h3,
+.cta-section h2 {
+  color: rgb(30, 28, 102);
+  font-family: 'Poppins', sans-serif;
+}
+
+.container { max-width: 1200px; margin: 0 auto; padding: 0 1.5rem; }
+
+/* --- ANIMATIONS --- */
+@keyframes fadeInUp { from { opacity: 0; transform: translateY(30px); } to { opacity: 1; transform: translateY(0); } }
+.fade-in-up-section { animation: fadeInUp 1s ease-out forwards; animation-timeline: view(); animation-range: entry 25%; }
+
+/* --- HERO SECTION --- */
+.hero-section {
+  text-align: center;
+  padding: 7rem 1rem;
+  background: var(--background-super-light);
+  position: relative;
+  overflow: hidden;
+}
+.hero-section .floating-icons {
+    position: absolute;
+    top: 0; left: 0;
+    width: 100%; height: 100%;
+    pointer-events: none;
+}
+.hero-section .floating-icons i {
+    position: absolute;
+    font-size: 2rem;
+    opacity: 0.1;
+    animation: float 15s infinite ease-in-out;
+}
+.hero-section .floating-icons .fa-whatsapp { color: var(--whatsapp-color); top: 10%; left: 15%; animation-delay: -2s; }
+.hero-section .floating-icons .fa-instagram { color: var(--instagram-color); top: 20%; right: 10%; animation-delay: -5s; }
+.hero-section .floating-icons .fa-telegram { color: var(--telegram-color); bottom: 15%; left: 20%; animation-delay: -8s; }
+.hero-section .floating-icons .fa-facebook-messenger { color: var(--facebook-color); bottom: 25%; right: 25%; animation-delay: -12s; }
+.hero-section .floating-icons .fa-twitter { color: var(--twitter-color); top: 60%; left: 5%; animation-delay: -15s; }
+
+@keyframes float {
+    0%, 100% { transform: translateY(0) rotate(0deg); }
+    50% { transform: translateY(-30px) rotate(180deg); }
+}
+
+.hero-section h1 {
+  font-size: clamp(2.8rem, 7vw, 4.2rem);
+  font-weight: 900;
+  color: rgb(30, 28, 102);
+  margin-bottom: 1rem;
+  letter-spacing: -2px;
+  position: relative;
+}
+.hero-section p {
+  font-size: clamp(1.1rem, 2.5vw, 1.3rem);
+  color: var(--text-light);
+  max-width: 750px;
+  margin: 0.5rem auto 2rem;
+  position: relative;
+}
+.hero-cta-button {
+  display: inline-block; 
+  padding: 1rem 2.5rem; 
+  background: var(--primary-color);
+  color: #fff; 
+  font-weight: 600; 
+  border-radius: 50px; 
+  text-decoration: none;
+  transition: all 0.3s ease; 
+  box-shadow: var(--shadow-lg); 
+  position: relative;
+  border: none;
+  cursor: pointer;
+  font-family: var(--font-primary);
+  font-size: 1.1rem;
+}
+.hero-cta-button:hover {
+  background: var(--primary-dark); 
+  transform: translateY(-5px);
+  box-shadow: 0 15px 20px -5px rgba(42, 109, 245, 0.3);
+}
+
+/* --- FAQ SECTION STYLES --- */
+.faq-section {
+  padding: 6rem 1rem;
+  background-color: transparent;
+}
+
+.faq-section .section-title {
+  text-align: center;
+  margin-bottom: 3rem;
+}
+
+.faq-section .section-title h2 {
+  font-size: 2.5rem;
+  color: rgb(30, 28, 102);
+  margin-bottom: 1rem;
+  font-weight: 700;
+}
+
+.faq-section .section-title p {
+  color: var(--text-light);
+  font-size: 1.1rem;
+  max-width: 600px;
+  margin: 0 auto;
+}
+
+.faq-item {
+  background-color: white;
+  border-radius: var(--radius-md);
+  margin-bottom: 1rem;
+  box-shadow: var(--shadow-sm);
+  border: 1px solid var(--border-color);
+  overflow: hidden;
+  transition: all 0.3s ease;
+}
+
+.faq-item.active {
+  border-color: var(--primary-color);
+  box-shadow: var(--shadow-md);
+}
+
+.faq-question {
+  padding: 1.5rem;
+  cursor: pointer;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  transition: all 0.3s ease;
+}
+
+.faq-question h3 {
+  margin: 0;
+  font-size: 1.1rem;
+  font-weight: 600;
+  color: rgb(30, 28, 102);
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.faq-question i:first-child {
+  color: var(--primary-color);
+  width: 24px;
+  text-align: center;
+}
+
+.faq-icon {
+  color: var(--text-light);
+  transition: transform 0.3s ease;
+}
+
+.faq-item.active .faq-icon {
+  transform: rotate(180deg);
+}
+
+.faq-answer {
+  max-height: 0;
+  overflow: hidden;
+  transition: max-height 0.3s ease-out;
+  background-color: rgba(255, 255, 255, 0.5);
+}
+
+.faq-answer p {
+  padding: 0 1.5rem 1.5rem 3.5rem;
+  margin: 0;
+  color: var(--text-light);
+  line-height: 1.6;
+}
+
+.faq-item.active .faq-answer {
+  max-height: 300px;
+}
+
+/* --- ESTRUCTURA GENERAL Y OTROS --- */
+#generator-section { background-color: transparent; padding: 6rem 0; }
+.main-columns {
+  display: flex;
+  width: 100%;
+  max-width: 1200px;
+  min-height: 100%;
+  gap: 2rem;
+  justify-content: center;
+  align-items: flex-start;
+  padding: 2rem;
+  margin: 0 auto;
+  box-sizing: border-box;
+}
+
+#generator-section {
+  flex: 1;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 6rem 1.5rem 0;
+  min-height: auto;
+  box-sizing: border-box;
+  margin-bottom: 2rem;
+}
+
+.side-column {
+  width: auto;
+  border-radius: 20px;
+  padding: 2rem;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  align-self: center;
+}
+
+/* Preview Container */
+.preview-container {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: center;
+  gap: 2rem;
+  width: 100%;
+  max-width: 100%;
+  margin: 0 auto;
+}
+
+/* Action Buttons */
+.action-buttons {
+
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+  justify-content: center;
+  align-items: center;
+  margin-left: 1.5rem;
+}
+
+.action-btn {
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: #ffffff;
+  border: 2px solid #e0e0e0;
+  border-radius: 50%;
+  width: 50px;
+  height: 50px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  box-shadow: 0 3px 10px rgba(0, 0, 0, 0.08);
+  position: relative;
+}
+
+
+.action-btn i {
+
+  font-size: 1.4rem;
+  color: #4a4a4a;
+  transition: all 0.3s ease;
+}
+
+/* Hide text visually but keep it accessible */
+.action-btn span {
+
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  border: 0;
+}
+
+/* Tooltip styles */
+.action-btn::after {
+
+  content: attr(title);
+  position: absolute;
+  left: 100%;
+  top: 50%;
+  transform: translateY(-50%);
+  background: #333;
+  color: white;
+  padding: 0.5rem 1rem;
+  border-radius: 6px;
+  font-size: 0.9rem;
+  white-space: nowrap;
+  opacity: 0;
+  visibility: hidden;
+  transition: all 0.2s ease;
+  margin-left: 15px;
+  pointer-events: none;
+  z-index: 10;
+}
+
+.action-btn:hover::after {
+
+  opacity: 1;
+  visibility: visible;
+  margin-left: 20px;
+}
+
+/* Button hover effects */
+.action-btn:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+}
+
+/* ===== VARIABLES DE COLOR ===== */
+:root {
+  /* Colores principales */
+  --color-primary: #25D366; /* WhatsApp Green */
+  --color-facebook: #1877F2;
+  --color-instagram-start: #f09433;
+  --color-instagram-end: #bc1888;
+  --color-telegram: #229ED9;
+  --color-twitter: #1DA1F2;
+  
+  /* Colores de estados */
+  --color-hover: rgba(0, 0, 0, 0.05);
+  --color-active: rgba(0, 0, 0, 0.1);
+  --color-border: #e0e0e0;
+  --color-text: #333;
+  --color-text-light: #666;
+  --color-bg: #fff;
+  --color-bg-light: #f8f9fa;
+  
+  /* Sombras */
+  --shadow-sm: 0 2px 4px rgba(0, 0, 0, 0.1);
+  --shadow-md: 0 4px 6px rgba(0, 0, 0, 0.1);
+  --shadow-lg: 0 10px 15px rgba(0, 0, 0, 0.1);
+  
+  /* Bordes */
+  --border-radius-sm: 4px;
+  --border-radius-md: 8px;
+  --border-radius-lg: 12px;
+  --border-radius-full: 9999px;
+}
+
+/* ===== ESTILOS BASE PARA BOTONES ===== */
+button,
+[type="button"],
+[type="submit"],
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  padding: 0.75rem 1.5rem;
+  border: none;
+  border-radius: var(--border-radius-md);
+  font-size: 1rem;
+  font-weight: 600;
+  line-height: 1.5;
+  text-align: center;
+  text-decoration: none;
+  white-space: nowrap;
+  cursor: pointer;
+  transition: all 0.2s ease-in-out;
+  background-color: var(--color-bg);
+  color: var(--color-text);
+}
+
+button:hover,
+[type="button"]:hover,
+[type="submit"]:hover,
+.btn:hover {
+  transform: translateY(-2px);
+}
+
+button:active,
+[type="button"]:active,
+[type="submit"]:active,
+.btn:active {
+  transform: translateY(1px);
+}
+
+button:focus,
+[type="button"]:focus,
+[type="submit"]:focus,
+.btn:focus {
+  outline: none;
+}
+
+/* Botones de plataforma */
+.btn-whatsapp {
+  background-color: var(--color-primary);
+  color: white;
+}
+
+.btn-facebook {
+  background-color: var(--color-facebook);
+  color: white;
+}
+
+.btn-instagram {
+  background: linear-gradient(45deg, var(--color-instagram-start), var(--color-instagram-end));
+  color: white;
+}
+
+.btn-telegram {
+  background-color: var(--color-telegram);
+  color: white;
+}
+
+.btn-twitter {
+  background-color: var(--color-twitter);
+  color: white;
+}
+
+/* ===== ESTILOS PARA CAMPOS DE TEXTO ===== */
+input[type="text"],
+input[type="tel"],
+input[type="email"],
+input[type="password"],
+textarea,
+select {
+  width: 100%;
+  padding: 0.75rem 1rem;
+  font-size: 1rem;
+  line-height: 1.5;
+  color: var(--color-text);
+  background-color: var(--color-bg);
+  background-clip: padding-box;
+  border: 1px solid var(--color-border);
+  border-radius: var(--border-radius-md);
+  transition: border-color 0.15s ease-in-out, box-shadow 0.15s ease-in-out;
+}
+
+input[type="text"]:focus,
+input[type="tel"]:focus,
+input[type="email"]:focus,
+input[type="password"]:focus,
+textarea:focus,
+select:focus {
+  border-color: var(--color-primary);
+  outline: 0;
+  box-shadow: 0 0 0 0.2rem rgba(37, 211, 102, 0.25);
+}
+
+/* Placeholders */
+::placeholder {
+  color: var(--color-text-light);
+  opacity: 1;
+}
+
+/* Deshabilitado */
+input:disabled,
+button:disabled,
+select:disabled,
+textarea:disabled {
+  opacity: 0.65;
+  cursor: not-allowed;
+}
+
+/* Grupos de formulario */
+.form-group {
+  margin-bottom: 1.5rem;
+}
+
+.form-group label {
+  display: block;
+  margin-bottom: 0.5rem;
+  font-weight: 600;
+  color: var(--color-text);
+}
+
+/* Botones de envío específicos del formulario */
+#generator-section [class$="-submit"] {
+  width: 100%;
+  margin-top: 1.5rem;
+  padding: 0.9rem 1.5rem;
+  border-radius: var(--border-radius-full);
+  font-size: 1rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+/* Efectos hover y active para botones de envío */
+#generator-section [class$="-submit"]:hover {
+  transform: translateY(-2px);
+  opacity: 0.95;
+}
+
+#generator-section [class$="-submit"]:active {
+  transform: translateY(1px);
+}
+
+/* Colores específicos para cada botón de plataforma */
+#form-whatsapp .btn-whatsapp-submit {
+  background-color: var(--color-primary);
+  box-shadow: 0 2px 8px rgba(37, 211, 102, 0.3);
+}
+
+#form-facebook .btn-facebook-submit {
+  background-color: var(--color-facebook);
+  box-shadow: 0 2px 8px rgba(24, 119, 242, 0.3);
+}
+
+#form-instagram .btn-instagram-submit {
+  background: linear-gradient(45deg, var(--color-instagram-start), var(--color-instagram-end));
+  box-shadow: 0 2px 8px rgba(220, 39, 67, 0.3);
+}
+
+#form-telegram .btn-telegram-submit {
+  background-color: var(--color-telegram);
+  box-shadow: 0 2px 8px rgba(34, 158, 217, 0.3);
+}
+
+#form-twitter .btn-twitter-submit {
+  background-color: var(--color-twitter);
+  box-shadow: 0 2px 8px rgba(29, 161, 242, 0.3);
+}
+
+/* Efectos de foco para accesibilidad */
+#form-whatsapp .btn-whatsapp-submit:focus-visible,
+#form-facebook .btn-facebook-submit:focus-visible,
+#form-instagram .btn-instagram-submit:focus-visible,
+#form-telegram .btn-telegram-submit:focus-visible,
+#form-twitter .btn-twitter-submit:focus-visible {
+  box-shadow: 0 0 0 3px rgba(0, 0, 0, 0.25);
+}
+
+.copy-btn {
+  border-color: #b3d7ff;
+  transition: all 0.2s ease;
+}
+
+.copy-btn:hover {
+  background-color: #e6f0ff;
+}
+
+.copy-btn:hover i {
+  color: #007bff;
+}
+
+.copy-btn:focus,
+.copy-btn:focus-visible {
+  outline: none !important;
+  box-shadow: 0 0 0 2px rgba(0, 123, 255, 0.25) !important;
+}
+
+.copy-btn:active {
+  background-color: #cce0ff !important;
+  transform: translateY(1px);
+  outline: none !important;
+  box-shadow: none !important;
+}
+
+.share-btn {
+  border-color: #b8e0c8;
+  transition: all 0.2s ease;
+}
+
+.share-btn:hover {
+  background-color: #e6f4ea;
+}
+
+.share-btn:hover i {
+  color: #28a745;
+}
+
+.share-btn:focus,
+.share-btn:focus-visible {
+  outline: none !important;
+  box-shadow: 0 0 0 2px rgba(40, 167, 69, 0.25) !important;
+}
+
+.share-btn:active {
+  background-color: #c3e6cb !important;
+  transform: translateY(1px);
+  outline: none !important;
+  box-shadow: none !important;
+}
+
+.download-btn {
+  border-color: #b3e5fc;
+  transition: all 0.2s ease;
+}
+
+.download-btn:hover {
+  background-color: #e1f5fe;
+}
+
+.download-btn:hover i {
+  color: #17a2b8;
+}
+
+.download-btn:focus,
+.download-btn:focus-visible {
+  outline: none !important;
+  box-shadow: 0 0 0 2px rgba(23, 162, 184, 0.25) !important;
+}
+
+.download-btn:active {
+  background-color: #b3e5fc !important;
+  transform: translateY(1px);
+  outline: none !important;
+  box-shadow: none !important;
+}
+
+
+@media (max-width: 1200px) {
+  .main-columns {
+    padding: 0 2rem;
+  }
+}
+
+
+@media (max-width: 1024px) {
+  .main-columns {
+    width: 100%;
+    max-width: 100%;
+    padding: 1.5rem;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    margin: 0 auto;
+  }
+
+  .side-column {
+    width: 100%;
+    max-width: 100%;
+    margin: 0 0 2rem 0;
+  }
+
+  .generator-container {
+    width: 33rem;
+    padding: 1.5rem;
+  }
+
+  .preview-container {
+    flex-direction: column;
+    gap: 1.5rem;
+  }
+
+  .action-buttons {
+    flex-direction: row;
+    margin: 1.5rem 0 0;
+    gap: 2rem;
+  }
+
+  .action-btn::after {
+    top: 100%;
+    left: 50%;
+    transform: translateX(-50%) translateY(8px);
+  }
+}
+
+
+
+.generator-container {
+  background: #fff;
+  padding: 2rem;
+  width: 100%;
+  max-width: 100%;
+  border-radius: 20px;
+  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.07);
+  display: flex;
+  flex-direction: column;
+  gap: 1.25rem;
+  align-items: stretch;
+  justify-content: center;
+  box-sizing: border-box;
+  margin: 0 auto;
+  transition: all 0.3s ease-in-out;
+}
+
+.generator-container h1 {
+  font-size: 2.2rem;
+  color: #000000;
+  font-weight: 800;
+  margin: 0px;
+  text-align: left;
+}
+
+.generator-container p {
+  margin-bottom: 1rem;
+  height: auto;
+  max-width: 100%;
+  text-align: left;
+}
+
+/* Mensaje de ayuda para copiar */
+.copy-instruction {
+  display: none; /* Oculto por defecto */
+  text-align: center;
+  color: #666;
+  font-size: 0.9rem;
+  margin: 0.5rem 0;
+  font-style: italic;
+  opacity: 0.8;
+  transition: opacity 0.3s ease;
+}
+
+/* Estilos para móviles */
+@media (max-width: 767px) {
+  .copy-instruction.active {
+    display: block;
+  }
+  
+  .copy-instruction .mobile-text {
+    display: inline;
+  }
+  
+  .copy-instruction .desktop-text {
+    display: none;
+  }
+}
+
+/* Estilos para tablets */
+@media (min-width: 768px) and (max-width: 1024px) {
+  .copy-instruction.active {
+    display: block;
+  }
+  
+  .copy-instruction .mobile-text {
+    display: none;
+  }
+  
+  .copy-instruction .desktop-text {
+    display: inline;
+  }
+}
+
+/* Mensaje de deslizar - Oculto por defecto */
+.swipe-hint {
+  display: none;
+}
+
+/* Mostrar solo en móviles y tablets */
+@media (max-width: 1024px) {
+  .swipe-hint {
+    display: inline-block;
+    color: #666;
+    font-size: 0.85rem;
+    margin: 0 1.5rem 0.5rem 1.5rem;
+    font-style: italic;
+    position: relative;
+    padding-right: 25px;
+    text-align: left;
+    width: auto;
+  }
+
+  .swipe-hint::after {
+    content: '→';
+    position: absolute;
+    right: 5px;
+    animation: swipeHint 1.5s infinite;
+    font-style: normal;
+  }
+}
+
+@keyframes swipeHint {
+  0%, 100% { transform: translateX(0); }
+  50% { transform: translateX(5px); }
+}
+
+/* Contenedor del carrusel - Estilos base para desktop */
+.social-carousel-container {
+  position: relative;
+  width: 100%;
+  margin-bottom: 1rem;
+  overflow: visible; /* Permitimos que el contenido fluya normalmente en desktop */
+}
+
+.social-btn-bar {
+  display: flex;
+  flex-wrap: nowrap; /* Asegura que los botones estén en una sola línea */
+  gap: 0.5rem;
+  width: 100%;
+  padding: 1rem 0; /* Solo padding vertical en desktop */
+  margin: 0;
+  justify-content: center; /* Centrar botones en desktop */
+}
+
+/* Mostrar el mensaje de deslizar solo en móvil/tablet */
+@media (max-width: 1024px) {
+  .swipe-hint {
+    display: block;
+  }
+  .social-carousel-container {
+    overflow: hidden; /* Contiene el desbordamiento en móvil/tablet */
+  }
+  
+  .social-btn-bar {
+    padding: 1rem 1.5rem;
+    overflow-x: auto; /* Habilita el scroll horizontal */
+    scroll-snap-type: x mandatory;
+    scroll-behavior: smooth;
+    -webkit-overflow-scrolling: touch;
+    scrollbar-width: none; /* Ocultar barra en Firefox */
+    -ms-overflow-style: none; /* Ocultar barra en IE/Edge */
+    scroll-padding: 0 1.5rem;
+    justify-content: flex-start; /* Alinear a la izquierda en móvil/tablet */
+  }
+  
+  /* Ocultar barra de desplazamiento en WebKit */
+  .social-btn-bar::-webkit-scrollbar {
+    display: none;
+  }
+}
+.social-btn-bar::-webkit-scrollbar {
+  display: none;
+}
+
+.social-btn {
+  flex: 0 0 auto;
+  min-width: 120px;
+  padding: 10px 15px;
+  border: none;
+  background: #e9ecef;
+  color: #222;
+  border-radius: 2rem;
+  font-weight: bold;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  white-space: nowrap;
+  margin: 0 0.25rem; /* Pequeño margen para evitar cortes */
+  transform: translateZ(0); /* Mejora el rendimiento de la GPU */
+  backface-visibility: hidden; /* Mejora el rendimiento de la animación */
+  -webkit-font-smoothing: subpixel-antialiased; /* Mejora la renderización del texto */
+}
+
+/* Flechas eliminadas - Solo desplazamiento táctil */
+
+.social-btn:hover {
+  background: #e9ecef;
+  transform: scale(1.05) translateZ(0); /* Reducir ligeramente el scale para evitar cortes */
+  z-index: 1; /* Asegura que el botón hover esté por encima */
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1); /* Sutil sombra para dar profundidad */
+}
+
+/* Ocultar botones de navegación en escritorio */
+@media (min-width: 769px) {
+  .social-btn {
+    flex: 1;
+  }
+}
+
+/* Estilos para tablets */
+@media (max-width: 1024px) and (min-width: 769px) {
+  .social-btn {
+    min-width: 140px;
+    padding: 10px 16px;
+    flex: 0 0 auto;
+  }
+}
+
+/* Mostrar el texto móvil en dispositivos táctiles */
+@media (hover: none) {
+  .copy-instruction .desktop-text {
+    display: none;
+  }
+  .copy-instruction .mobile-text {
+    display: inline;
+  }
+}
+
+/* Estilos para móviles */
+@media (max-width: 768px) {
+  .social-btn {
+    min-width: 120px;
+    padding: 10px 14px;
+    font-size: 0.85rem;
+    flex: 0 0 calc(33.333% - 8px); /* Muestra 3 botones a la vez */
+    box-sizing: border-box;
+    scroll-snap-align: start; /* Mejora el desplazamiento táctil */
+  }
+
+  .social-btn i {
+    font-size: 1rem;
+    margin-right: 6px; /* Añade espacio entre el icono y el texto */
+  }
+
+  .social-btn span {
+    display: inline-block;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    max-width: 100%;
+  }
+  
+  .social-btn-bar {
+    padding: 1rem 1.5rem; /* Padding lateral para móvil */
+  }
+  
+  .social-btn {
+    min-width: 120px; /* Ancho mínimo un poco mayor para mejor toque */
+    padding: 10px 16px;
+    scroll-snap-align: start;
+    flex: 0 0 calc(50% - 12px); /* 2 botones por fila en móviles pequeños */
+  }
+  
+  .social-carousel-container {
+    margin: 0 -1.5rem; /* Compensa el padding del contenedor principal */
+    width: calc(100% + 3rem); /* Asegura que ocupe todo el ancho */
+  }
+
+/* Ajustes para pantallas muy pequeñas */
+}
+
+/* Ajustes para pantallas muy pequeñas */
+@media (max-width: 480px) {
+  .social-btn {
+    min-width: 90px;
+    padding: 6px 10px;
+    font-size: 0.8rem;
+    flex: 0 0 calc(45% - 8px); /* 2 botones por fila en móviles pequeños */
+  }
+
+  .social-btn i {
+    font-size: 0.9rem;
+  }
+}
+
+/* WhatsApp */
+.social-btn.btn-whatsapp {
+  background: #25D366;
+  border: 2px solid #25D366;
+  color: #fff;
+  transition: all 0.3s ease;
+}
+.social-btn.btn-whatsapp:hover,
+.social-btn.btn-whatsapp:active,
+.social-btn.btn-whatsapp.active {
+  background: #fff;
+  color: #25D366;
+}
+
+/* Facebook Messenger */
+.social-btn.btn-facebook {
+  background: #0084FF;
+  border: 2px solid #0084FF;
+  color: #fff;
+  transition: all 0.3s ease;
+}
+.social-btn.btn-facebook:hover,
+.social-btn.btn-facebook:active,
+.social-btn.btn-facebook.active {
+  background: #fff;
+  color: #0084FF;
+}
+
+/* Instagram */
+.social-btn.btn-instagram {
+  background: linear-gradient(#a11de0, #9a23e7);
+  border: 2px solid #a11de0;
+  color: #fff;
+  transition: all 0.3s ease;
+}
+.social-btn.btn-instagram:hover,
+.social-btn.btn-instagram:active,
+.social-btn.btn-instagram.active {
+  background: #fff;
+  color: #a11de0;
+}
+
+/* Telegram */
+.social-btn.btn-telegram {
+  background: #357ebd;
+  border: 2px solid #357ebd;
+  color: #fff;
+  transition: all 0.3s ease;
+}
+.social-btn.btn-telegram:hover,
+.social-btn.btn-telegram:active,
+.social-btn.btn-telegram.active {
+  background: #fff;
+  color: #357ebd;
+}
+
+/* Twitter */
+.social-btn.btn-twitter {
+  background: #1DA1F2;
+  border: 2px solid #1DA1F2;
+  color: #fff;
+  transition: all 0.3s ease;
+}
+.social-btn.btn-twitter:hover,
+.social-btn.btn-twitter:active,
+.social-btn.btn-twitter.active {
+  background: #fff;
+  color: #1DA1F2;
+}
+.social-btn.btn-twitter:active {
+  background: #1DA1F2;
+  color: #fff;
+}
+
+
+form {
+  display: none;
+  flex-direction: column;
+  gap: 0.5rem;
+  margin-bottom: 1rem;
+}
+
+form.active {
+  display: flex;
+}
+
+label {
+  font-weight: bold;
+  font-size: 0.95rem;
+  margin-bottom: 0.15rem;
+}
+
+/* ===== ESTILOS PARA CAMPOS DE TEXTO ===== */
+input[type="text"],
+input[type="tel"],
+input[type="email"],
+input[type="password"],
+textarea,
+select {
+  width: 100%;
+  padding: 0.75rem 1rem;
+  font-size: 1rem;
+  line-height: 1.5;
+  color: var(--color-text);
+  background-color: var(--color-bg);
+  background-clip: padding-box;
+  border: 2px solid var(--color-border);
+  border-radius: var(--border-radius-md);
+  transition: all 0.3s ease-in-out;
+  margin-bottom: 0.5rem;
+  box-sizing: border-box;
+  font-family: inherit;
+}
+
+textarea {
+  min-height: 100px;
+  resize: vertical;
+  display: block;
+}
+
+/* Estados de foco para cada formulario */
+input:focus,
+textarea:focus,
+select:focus {
+  border-color: var(--color-primary);
+  outline: 0;
+  box-shadow: 0 0 0 0.2rem rgba(37, 211, 102, 0.25);
+  background-color: #fff;
+}
+
+#form-whatsapp input:focus,
+#form-whatsapp textarea:focus {
+  border-color: var(--color-primary);
+  box-shadow: 0 0 0 0.2rem rgba(37, 211, 102, 0.25);
+}
+
+#form-facebook input:focus,
+#form-facebook textarea:focus {
+  border-color: var(--color-facebook);
+  box-shadow: 0 0 0 0.2rem rgba(24, 119, 242, 0.25);
+}
+
+#form-instagram input:focus,
+#form-instagram textarea:focus {
+  border-color: var(--color-instagram-end);
+  box-shadow: 0 0 0 0.2rem rgba(220, 39, 67, 0.25);
+}
+
+#form-telegram input:focus,
+#form-telegram textarea:focus {
+  border-color: var(--color-telegram);
+  box-shadow: 0 0 0 0.2rem rgba(34, 158, 217, 0.25);
+}
+
+#form-twitter input:focus,
+#form-twitter textarea:focus {
+  border-color: var(--color-twitter);
+  box-shadow: 0 0 0 0.2rem rgba(29, 161, 242, 0.25);
+}
+
+/* Placeholders */
+::placeholder {
+  color: var(--color-text-light);
+  opacity: 0.7;
+  font-style: normal;
+  font-size: 0.95rem;
+}
+
+input:focus::placeholder,
+textarea:focus::placeholder {
+  opacity: 0.5;
+}
+
+/* Estados de deshabilitado */
+input:disabled,
+textarea:disabled,
+select:disabled {
+  background-color: var(--color-bg-light);
+  cursor: not-allowed;
+  opacity: 0.8;
+}
+
+/* [type=button], [type=submit], button {
+  margin-top: 0.5rem;
+  background: #198754;
+  color: #fff;
+  border: none;
+  border-radius: 100px;
+  padding: 0.9rem 1.5rem;
+  font-size: 1rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease-in-out;
+  width: 100%;
+  max-width: 100%;
+  box-sizing: border-box;
+  outline: none;
+  box-shadow: none;
+} */
+
+/* Estilos base para botones en el generador */
+#generator-section [class$="-submit"] {
+  margin-top: 0.5rem;
+  border: none;
+  border-radius: 100px;
+  padding: 0.9rem 1.5rem;
+  font-size: 1rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease-in-out;
+  width: 100%;
+  max-width: 100%;
+  box-sizing: border-box;
+  outline: none;
+  box-shadow: none;
+  color: #fff;
+  display: block;
+}
+
+/* Efectos hover y active */
+#generator-section [class$="-submit"]:hover {
+  opacity: 0.9;
+  transform: translateY(-2px);
+}
+
+#generator-section [class$="-submit"]:active {
+  transform: translateY(1px);
+}
+
+/* Estilos específicos para cada botón */
+#form-whatsapp .btn-whatsapp-submit {
+  background: #25D366;
+}
+
+#form-facebook .btn-facebook-submit {
+  background: #136bff;
+}
+
+#form-instagram .btn-instagram-submit {
+  background: linear-gradient(#a11de0, #9a23e7);
+}
+
+#form-telegram .btn-telegram-submit {
+  background: #357ebd;
+}
+
+#form-twitter .btn-twitter-submit {
+  background: #1DA1F2;
+}
+
+/* Efectos focus para accesibilidad */
+#form-whatsapp .btn-whatsapp-submit:focus,
+#form-facebook .btn-facebook-submit:focus,
+#form-instagram .btn-instagram-submit:focus,
+#form-telegram .btn-telegram-submit:focus,
+#form-twitter .btn-twitter-submit:focus {
+  outline: none;
+  box-shadow: 0 0 0 2px rgba(0, 0, 0, 0.1);
+}
+
+#form-whatsapp .btn-whatsapp-submit:focus-visible,
+#form-facebook .btn-facebook-submit:focus-visible,
+#form-instagram .btn-instagram-submit:focus-visible,
+#form-telegram .btn-telegram-submit:focus-visible,
+#form-twitter .btn-twitter-submit:focus-visible {
+  box-shadow: 0 0 0 2px rgba(0, 0, 0, 0.25);
+}
+
+/* Tablet Styles */
+@media (max-width: 1024px) {
+  .main-columns {
+    padding: 4rem;
+  }
+
+  .side-column,
+  .generator-container {
+    width: 100%;
+    padding: 1.5rem;
+    border-radius: 12px;
+  }
+
+  .generator-container h1 {
+    font-size: 1.8rem;
+  }
+
+  .social-btn {
+    padding: 8px;
+    font-size: 0.85rem;
+  }
+
+  input,
+  textarea {
+    padding: 0.5rem 0.8rem;
+  }
+}
+
+/* Phone Styles */
+@media (max-width: 600px) {
+
+  .main-columns {
+    flex-direction: column;
+    padding: 0;
+    width: 100%;
+    max-width: 100%;
+    justify-content: center;
+    align-items: center;
+    gap: 1.5rem;
+  }
+
+  .side-column,
+  .generator-container {
+    width: 100%;
+    max-width: 100%;
+    padding: 1.5rem 1.25rem;
+    border-radius: 16px;
+    display: flex;
+    flex-direction: column;
+    margin: 0;
+  }
+
+  .generator-container h1 {
+    font-size: 1.8rem;
+  }
+
+  .social-btn {
+    padding: 8px;
+    font-size: 0.85rem;
+  }
+
+  input,
+  textarea {
+    padding: 0.5rem 0.8rem;
+  }
+}
+
+.result {
+  background: #f5f6fa;
+  border-radius: 6px;
+  padding: 1rem;
+  text-align: center;
+  font-size: 1.1rem;
+  margin: 0.5rem 0 0;
+  cursor: pointer;
+  transition: all 0.3s ease-in-out;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+  outline: none;
+  color: #333;
+  font-family: 'Fira Mono', 'Consolas', 'Menlo', 'Monaco', monospace;
+  border: 1px solid #e0e0e0;
+  user-select: all;
+  letter-spacing: 0.01em;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  width: 100%;
+  box-sizing: border-box;
+  display: none;
+}
+
+.result.show {
+  display: block;
+  animation: fadeIn 0.3s ease-in-out;
+}
+
+.result.show + .copy-instruction {
+  display: block;
+  margin-bottom: 1rem;
+}
+
+
+.result:hover,
+.result:focus {
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.10);
+  background: #d4edda;
+}
+
+.floating-tooltip {
+  position: fixed;
+  pointer-events: none;
+  background: #333;
+  color: #fff;
+  padding: 5px 13px;
+  border-radius: 4px;
+  font-size: 0.97em;
+  white-space: nowrap;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.16);
+  opacity: 0;
+  transition: opacity 0.18s;
+  z-index: 9999;
+}
+
+.floating-tooltip.visible {
+  opacity: 1;
+}
+
+
+.tab-desc {
+  display: none;
+}
+
+.tab-desc.active {
+  display: block;
+}
+
+.generator-container {
+  width: 50rem;
+  padding: 2rem;
+}
+
+
+/* Estilos responsivos */
+@media (max-width: 900px) {
+  #generator-section {
+    padding: 5rem 1rem 1rem;
+    /* Menor espacio en móviles pero aún suficiente */
+  }
+
+  .main-columns {
+    flex-direction: column;
+    gap: 2rem;
+    align-items: center;
+  }
+
+  .generator-container{
+    width: 100%;
+  }
+  .side-column,
+  .preview-container {
+    width: 100%;
+    max-width: 100%;
+  }
+
+  .preview-container {
+    flex-direction: column;
+    flex-wrap: wrap;
+  }
+
+  .info-section,
+  .cta-section {
+    padding: 2rem 0;
+  }
+
+  .cta-content {
+    padding: 2rem;
+  }
+}
+
+/* New Sections Styles */
+
+/* Secciones independientes */
+.page-section {
+  width: 100%;
+  box-sizing: border-box;
+  margin: 0;
+  /* Aseguramos que no haya márgenes adicionales */
+  padding: 2rem 0;
+  /* Reducido el padding vertical */
+}
+
+.page-section .container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0 24px;
+}
+
+/* Info Section */
+.info-section {
+  padding: 40px 0;
+  /* Reducido el padding vertical */
+  background-color: #ffffff;
+  width: 100%;
+  box-sizing: border-box;
+  margin: 0;
+  /* Eliminado el margen superior */
+  border-top: 1px solid #e5e7eb;
+  border-bottom: 1px solid #e5e7eb;
+}
+
+.container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0 24px;
+}
+
+.section-header {
+  text-align: center;
+  max-width: 800px;
+  margin: 0 auto 64px;
+}
+
+.section-header h2 {
+  font-size: 2.25rem;
+  font-weight: 700;
+  color: #1E1C66;
+  margin-bottom: 16px;
+  line-height: 1.2;
+}
+
+.section-header p {
+  font-size: 1.125rem;
+  color: #6b7280;
+  line-height: 1.6;
+  margin: 0;
+}
+
+/* Feature Rows */
+.feature-row {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 24px;
+  margin-bottom: 48px;
+}
+
+@media (min-width: 768px) {
+  .feature-row {
+    flex-direction: row;
+    align-items: flex-start;
+  }
+}
+
+.icon-container {
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 80px;
+  height: 80px;
+  border-radius: 16px;
+}
+
+.icon-container svg {
+  width: 40px;
+  height: 40px;
+}
+
+/* Icon Colors */
+.icon-blue {
+  background-color: #dbeafe;
+  color: #2563eb;
+}
+
+.icon-green {
+  background-color: #d1fae5;
+  color: #059669;
+}
+
+.icon-yellow {
+  background-color: #fef9c3;
+  color: #d97706;
+}
+
+.icon-purple {
+  background-color: #ede9fe;
+  color: #7c3aed;
+}
+
+.text-content h3 {
+  font-size: 1.5rem;
+  font-weight: 600;
+  color: #1E1C66;
+  margin: 0 0 12px 0;
+}
+
+.text-content p {
+  font-size: 1.05rem;
+  line-height: 1.7;
+  color: #4b5563;
+  margin: 0;
+}
+
+/* Separator */
+.separator {
+  border: none;
+  height: 1px;
+  background-color: #e5e7eb;
+  margin: 100px 0 60px 0;
+  width: 100%;
+  max-width: 1200px;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+/* Examples Grid */
+.examples-grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 24px;
+  margin-top: 40px;
+}
+
+@media (min-width: 768px) {
+  .examples-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+.example-card {
+  background: #ffffff;
+  border: 1px solid #e5e7eb;
+  border-radius: 16px;
+  padding: 24px;
+  transition: all 0.3s ease;
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 2px 4px -1px rgba(0, 0, 0, 0.05);
+}
+
+.example-card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+}
+
+.example-card h4 {
+  font-size: 1.25rem;
+  font-weight: 600;
+  color: #1E1C66;
+  margin: 0 0 12px 0;
+}
+
+.example-card p {
+  color: #4b5563;
+  line-height: 1.6;
+  margin-bottom: 16px;
+}
+
+.example-card .message {
+  background-color: #f9fafb;
+  border-radius: 12px;
+  padding: 16px;
+  position: relative;
+  margin-top: 16px;
+  font-style: italic;
+  color: #4b5563;
+  border-left: 3px solid #1E1C66;
+}
+
+.example-card .message span {
+  color: #1E1C66;
+  font-weight: 600;
+  font-style: normal;
+}
+
+/* CTA Section */
+.cta-section {
+  padding: 0;
+  margin: 60px 0 80px 0;
+  width: 100%;
+}
+
+.cta-content {
+  background: linear-gradient(135deg, #1E1C66 0%, #2D3BEF 100%);
+  border-radius: 24px;
+  padding: 80px 48px;
+  text-align: center;
+  color: white;
+  max-width: 1000px;
+  margin: 0 auto;
+  box-sizing: border-box;
+  position: relative;
+  overflow: hidden;
+}
+
+.cta-content h2 {
+  font-size: 2.25rem;
+  font-weight: 700;
+  margin: 0 0 16px 0;
+  color: white;
+  line-height: 1.2;
+}
+
+.cta-content p {
+  font-size: 1.125rem;
+  line-height: 1.7;
+  max-width: 700px;
+  margin: 0 auto 32px;
+  color: #e0e7ff;
+}
+
+.cta-button {
+  display: inline-block;
+  background-color: white;
+  color: #1E1C66;
+  font-weight: 600;
+  padding: 14px 32px;
+  border-radius: 50px;
+  text-decoration: none;
+  transition: all 0.3s ease;
+  border: 2px solid white;
+  font-size: 1rem;
+}
+
+.cta-button:hover {
+  background-color: transparent;
+  color: white;
+}
+
+/* Responsive Adjustments */
+@media (max-width: 768px) {
+  .section-header h2 {
+    font-size: 1.75rem;
+  }
+
+  .section-header p {
+    font-size: 1rem;
+  }
+
+  .cta-content {
+    padding: 48px 24px;
+  }
+
+  .cta-content h2 {
+    font-size: 1.75rem;
+  }
+
+  .cta-content p {
+    font-size: 1rem;
+  }
+
+  .cta-button {
+    padding: 12px 24px;
+  }
+}
+
+/* Sobrescribir estilos de Elementor para botones */
+/* Estilos para botones de redes sociales */
+.social-btn,
+.social-btn:link,
+.social-btn:visited,
+.social-btn:active,
+.social-btn:hover {
+  color: var(--text-light) !important;
+  text-decoration: none !important;
+  background: white !important;
+}
+
+.social-btn i {
+  color: inherit !important;
+}
+
+.social-btn.active {
+  color: white !important;
+}
+
+/* Estilos específicos para cada botón activo */
+.btn-whatsapp.active { 
+  background-color: var(--whatsapp-color) !important; 
+}
+.btn-facebook.active { 
+  background-color: var(--facebook-color) !important; 
+}
+.btn-instagram {
+  background: white !important;
+  color: var(--text-light) !important;
+}
+.btn-instagram.active { 
+  background: linear-gradient(135deg, #8a2be2, #9932cc) !important;
+  color: white !important;
+}
+.btn-telegram.active { 
+  background-color: var(--telegram-color) !important; 
+}
+.btn-twitter.active { 
+  background-color: var(--twitter-color) !important; 
+}
+
+/* Estilos para el botón de hero */
+.hero-cta-button,
+.hero-cta-button:link,
+.hero-cta-button:visited,
+.hero-cta-button:active,
+.hero-cta-button:hover {
+  color: white !important;
+  text-decoration: none !important;
+  background: var(--primary-color) !important;
+}
+
+/* Asegurar que los botones de envío mantengan sus estilos */
+[type="submit"],
+[type="submit"]:hover,
+[type="submit"]:active {
+  color: white !important;
+  text-decoration: none !important;
+}
+
+/* Sobrescribir estilos de enlaces en general */
+a:not([class]) {
+  color: var(--primary-color) !important;
+  text-decoration: none !important;
+}
+

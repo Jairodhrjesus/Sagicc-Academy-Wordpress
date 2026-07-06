@@ -1,0 +1,31 @@
+# OS metadata files
+.DS_Store
+Thumbs.db
+db.db
+*.bak
+*.sql
+*.zip
+
+# WordPress specific
+wp-config.php
+wp-content/uploads/
+wp-content/upgrade/
+wp-content/backup-db/
+wp-content/debug.log
+wp-content/advanced-cache.php
+wp-content/wp-cache-config.php
+wp-content/cache/
+
+# WordPress Studio & SQLite integration specific
+wp-content/database/
+wp-content/database/.ht.sqlite
+.studio/
+
+# IDEs and editors
+.idea/
+.vscode/
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+*.swp

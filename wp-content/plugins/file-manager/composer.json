@@ -1,0 +1,43 @@
+{
+  "name": "bitapps/file-manager",
+  "description": "A file management plugin for wordpress",
+  "license": "gpl-2",
+  "autoload": {
+    "psr-4": {
+      "BitApps\\FM\\": "./backend/app"
+    }
+  },
+  "scripts": {
+    "test": "phpunit",
+    "lint": "./vendor/bin/php-cs-fixer fix --config=.php-cs-fixer.php",
+    "unused:variable": "phpcs -p --standard=VariableAnalysis backend",
+    "compat": "./vendor/bin/phpcs -p ./backend --standard=PHPCompatibilityWP --runtime-set testVersion 7.4-"
+  },
+  "require-dev": {
+    "friendsofphp/php-cs-fixer": "^3.10",
+    "sirbrillig/phpcs-variable-analysis": "*",
+    "dealerdirect/phpcodesniffer-composer-installer": "^0.7",
+    "phpcompatibility/phpcompatibility-wp": "*",
+    "phpunit/phpunit": "^13.1",
+    "10up/wp_mock": "^0.4.2"
+  },
+  "config": {
+    "allow-plugins": {
+      "dealerdirect/phpcodesniffer-composer-installer": true,
+      "typisttech/imposter-plugin": true
+    }
+  },
+  "require": {
+    "bitapps/wp-validator": "^1.2.3",
+    "bitapps/wp-kit": "^2.2",
+    "bitapps/wp-database": "^1.11",
+    "bitapps/wp-telemetry": "^0.0.9",
+    "typisttech/imposter-plugin": "^0.6.2",
+    "studio-42/elfinder": "^2.1"
+  },
+  "extra": {
+    "imposter": {
+      "namespace": "BitApps\\FM\\Vendor\\"
+    }
+  }
+}
