@@ -425,33 +425,57 @@ add_shortcode('sagicc_certificates_list', function () {
 	$user_id = get_current_user_id();
 	$certificates = array();
 
-	// 1. Get Course Certificates
-	if (function_exists('learndash_user_get_completed_courses')) {
-		$completed_courses = learndash_user_get_completed_courses($user_id);
-		if (!empty($completed_courses) && is_array($completed_courses)) {
-			foreach ($completed_courses as $course_id) {
-				if (function_exists('learndash_get_course_certificate_link')) {
-					$cert_link = learndash_get_course_certificate_link($course_id, $user_id);
-					if (!empty($cert_link)) {
-						$completed_date = '';
-						if (function_exists('learndash_user_course_completed_date')) {
-							$completed_timestamp = learndash_user_course_completed_date($user_id, $course_id);
-							if ($completed_timestamp) {
-								$completed_date = wp_date(get_option('date_format'), $completed_timestamp);
-							}
-						}
-
-						$certificates[] = array(
-							'title'     => get_the_title($course_id),
-							'link'      => $cert_link,
-							'date'      => $completed_date,
-							'type'      => 'course',
-							'badge'     => $t('course'),
-							'unique_id' => 'course-' . $course_id
-						);
+	// 1. Get Course Certificates & Completed Courses
+	$completed_courses = array();
+	if ( function_exists( 'learndash_user_get_completed_courses' ) ) {
+		$completed_courses = learndash_user_get_completed_courses( $user_id );
+	}
+	if ( empty( $completed_courses ) ) {
+		$all_user_meta = get_user_meta( $user_id );
+		if ( is_array( $all_user_meta ) ) {
+			foreach ( $all_user_meta as $meta_key => $meta_val ) {
+				if ( strpos( $meta_key, 'course_completed_' ) === 0 && ! empty( $meta_val[0] ) ) {
+					$cid = (int) str_replace( 'course_completed_', '', $meta_key );
+					if ( $cid > 0 ) {
+						$completed_courses[] = $cid;
 					}
 				}
 			}
+		}
+	}
+
+	if ( ! empty( $completed_courses ) && is_array( $completed_courses ) ) {
+		foreach ( $completed_courses as $course_id ) {
+			$cert_link = '';
+			if ( function_exists( 'learndash_get_course_certificate_link' ) ) {
+				$cert_link = learndash_get_course_certificate_link( $course_id, $user_id );
+			}
+			if ( empty( $cert_link ) ) {
+				$cert_link = get_permalink( $course_id );
+			}
+
+			$completed_date = '';
+			if ( function_exists( 'learndash_user_course_completed_date' ) ) {
+				$completed_timestamp = learndash_user_course_completed_date( $user_id, $course_id );
+				if ( $completed_timestamp ) {
+					$completed_date = wp_date( get_option( 'date_format' ), $completed_timestamp );
+				}
+			}
+			if ( empty( $completed_date ) ) {
+				$meta_date = get_user_meta( $user_id, 'course_completed_' . $course_id, true );
+				if ( $meta_date && is_numeric( $meta_date ) ) {
+					$completed_date = wp_date( get_option( 'date_format' ), (int) $meta_date );
+				}
+			}
+
+			$certificates[] = array(
+				'title'     => get_the_title( $course_id ),
+				'link'      => $cert_link,
+				'date'      => $completed_date,
+				'type'      => 'course',
+				'badge'     => $t( 'course' ),
+				'unique_id' => 'course-' . $course_id
+			);
 		}
 	}
 
