@@ -352,6 +352,13 @@
 	border-color: var(--sagicc-secondary);
 }
 
+.sa-input-readonly {
+	background-color: var(--sagicc-gray-50);
+	color: var(--sagicc-gray-400);
+	cursor: not-allowed;
+	user-select: none;
+}
+
 .sa-form-grid-2 {
 	display: grid;
 	grid-template-columns: 1fr;

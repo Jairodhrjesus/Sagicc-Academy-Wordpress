@@ -36,31 +36,25 @@ $upload_success   = '';
 $password_error   = '';
 $password_success = '';
 
-// 1. Update Personal Info Form
+// 1. Update Personal Info Form (Nombre, Apellido, Nombre visible)
 if ( $is_own_profile && isset( $_POST['submit_profile_info'] ) ) {
 	if ( isset( $_POST['profile_info_nonce'] ) && wp_verify_nonce( $_POST['profile_info_nonce'], 'update_profile_info_action' ) ) {
 		$new_first_name   = sanitize_text_field( $_POST['first_name'] );
 		$new_last_name    = sanitize_text_field( $_POST['last_name'] );
 		$new_display_name = sanitize_text_field( $_POST['display_name'] );
-		$new_email        = sanitize_email( $_POST['email'] );
 
-		if ( ! is_email( $new_email ) ) {
-			$info_error = 'El correo electrónico no es válido.';
+		$update_data = array(
+			'ID'           => $user_id,
+			'first_name'   => $new_first_name,
+			'last_name'    => $new_last_name,
+			'display_name' => $new_display_name,
+		);
+		$res = wp_update_user( $update_data );
+		if ( is_wp_error( $res ) ) {
+			$info_error = $res->get_error_message();
 		} else {
-			$update_data = array(
-				'ID'           => $user_id,
-				'first_name'   => $new_first_name,
-				'last_name'    => $new_last_name,
-				'display_name' => $new_display_name,
-				'user_email'   => $new_email,
-			);
-			$res = wp_update_user( $update_data );
-			if ( is_wp_error( $res ) ) {
-				$info_error = $res->get_error_message();
-			} else {
-				$info_success = 'Información personal actualizada con éxito.';
-				$current_user = get_userdata( $user_id );
-			}
+			$info_success = 'Información personal actualizada con éxito.';
+			$current_user = get_userdata( $user_id );
 		}
 	} else {
 		$info_error = 'Error de seguridad. Por favor, intenta de nuevo.';

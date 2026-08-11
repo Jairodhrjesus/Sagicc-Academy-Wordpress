@@ -38,7 +38,9 @@ if ( ! defined( 'ABSPATH' ) ) {
 
 				<div class="sa-form-group">
 					<label for="email" class="sa-form-label"><?php echo esc_html( $p['t']( 'profile.email' ) ); ?></label>
-					<input type="email" name="email" id="email" value="<?php echo esc_attr( $p['email'] ); ?>" required class="sa-input" />
+					<div class="position-relative">
+						<input type="email" id="email" value="<?php echo esc_attr( $p['email'] ); ?>" readonly class="sa-input sa-input-readonly" title="El correo electrónico no se puede modificar desde aquí." />
+					</div>
 				</div>
 			</div>
 
