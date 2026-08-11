@@ -1,86 +1,301 @@
 /* ==========================================================================
    Gutenberg Content Styling (.editor-content)
    ========================================================================== */
+
+/* Layout & Alignment */
+.editor-content {
+	max-width: 880px;
+	width: 100%;
+	text-align: left !important;
+	margin-left: 0 !important;
+}
+
+.editor-content > *,
+.editor-content p,
+.editor-content h1,
+.editor-content h2,
+.editor-content h3,
+.editor-content h4,
+.editor-content h5,
+.editor-content h6,
+.editor-content ul,
+.editor-content ol,
+.editor-content blockquote,
+.editor-content pre {
+	text-align: left !important;
+	margin-left: 0;
+}
+
+/* Headings */
 .editor-content h1 {
+	font-family: var(--font-heading, 'Outfit', sans-serif);
 	font-size: 2.25rem;
 	font-weight: 900;
-	color: var(--sagicc-secondary);
-	letter-spacing: -0.05em;
+	color: var(--sagicc-secondary, #0F172A);
+	letter-spacing: -0.04em;
+	line-height: 1.25;
 	margin-top: 2rem;
 	margin-bottom: 1rem;
 }
 
 .editor-content h2 {
-	font-size: 1.5rem;
+	font-family: var(--font-heading, 'Outfit', sans-serif);
+	font-size: 1.65rem;
 	font-weight: 800;
-	color: var(--sagicc-secondary);
-	letter-spacing: -0.025em;
-	margin-top: 1.5rem;
-	margin-bottom: 0.75rem;
+	color: var(--sagicc-secondary, #0F172A);
+	letter-spacing: -0.03em;
+	line-height: 1.3;
+	margin-top: 2.25rem;
+	margin-bottom: 0.875rem;
+	padding-bottom: 0.5rem;
+	border-bottom: 2px solid var(--sagicc-gray-100, #F1F5F9);
 }
 
 .editor-content h3 {
-	font-size: 1.25rem;
+	font-family: var(--font-heading, 'Outfit', sans-serif);
+	font-size: 1.35rem;
 	font-weight: 700;
-	color: var(--sagicc-secondary);
-	letter-spacing: -0.025em;
-	margin-top: 1.25rem;
-	margin-bottom: 0.5rem;
+	color: var(--sagicc-secondary, #0F172A);
+	letter-spacing: -0.02em;
+	line-height: 1.35;
+	margin-top: 1.75rem;
+	margin-bottom: 0.75rem;
 }
 
 .editor-content h4 {
-	font-size: 1.125rem;
+	font-size: 1.15rem;
 	font-weight: 600;
-	color: var(--sagicc-secondary);
-	margin-top: 1rem;
+	color: var(--sagicc-secondary, #0F172A);
+	margin-top: 1.5rem;
 	margin-bottom: 0.5rem;
 }
 
+/* Paragraphs & Reading Text */
 .editor-content p {
-	color: var(--sagicc-gray-600);
-	font-size: 1rem;
-	line-height: 1.625;
-	margin-bottom: 1rem;
+	color: #334155; /* Slate 700 for smooth reading contrast */
+	font-size: 1.0625rem; /* 17px */
+	line-height: 1.75;
+	margin-bottom: 1.35rem;
+	letter-spacing: -0.01em;
 }
 
+/* Links */
+.editor-content a {
+	color: var(--sagicc-primary, #0052FF);
+	font-weight: 600;
+	text-decoration: underline;
+	text-underline-offset: 3px;
+	text-decoration-color: rgba(0, 82, 255, 0.4);
+	transition: color 0.15s ease, text-decoration-color 0.15s ease;
+}
+
+.editor-content a:hover {
+	color: #003ECC;
+	text-decoration-color: #003ECC;
+}
+
+/* Lists */
 .editor-content ul {
 	list-style-type: disc;
 	padding-left: 1.5rem;
-	margin-bottom: 1rem;
-	color: var(--sagicc-gray-600);
+	margin-bottom: 1.5rem;
+	color: #334155;
 }
 
-.editor-content ul > li + li {
-	margin-top: 0.25rem;
+.editor-content ul > li {
+	margin-bottom: 0.5rem;
+	line-height: 1.65;
+	font-size: 1.05rem;
+}
+
+.editor-content ul > li::marker {
+	color: var(--sagicc-primary, #0052FF);
 }
 
 .editor-content ol {
 	list-style-type: decimal;
 	padding-left: 1.5rem;
-	margin-bottom: 1rem;
-	color: var(--sagicc-gray-600);
+	margin-bottom: 1.5rem;
+	color: #334155;
 }
 
-.editor-content ol > li + li {
-	margin-top: 0.25rem;
+.editor-content ol > li {
+	margin-bottom: 0.5rem;
+	line-height: 1.65;
+	font-size: 1.05rem;
 }
 
-.editor-content a {
-	color: var(--sagicc-primary);
+.editor-content ol > li::marker {
 	font-weight: 700;
-	text-decoration: none;
+	color: var(--sagicc-secondary, #0F172A);
 }
 
-.editor-content a:hover {
-	text-decoration: underline;
-}
-
+/* Blockquotes */
 .editor-content blockquote {
-	border-left: 4px solid var(--sagicc-gray-200);
-	padding-left: 1rem;
+	border-left: 4px solid var(--sagicc-primary, #0052FF);
+	background-color: var(--sagicc-gray-50, #F8FAFC);
+	padding: 1.25rem 1.5rem;
+	margin: 1.75rem 0;
+	border-radius: 0 0.875rem 0.875rem 0;
+	font-size: 1.1rem;
 	font-style: italic;
-	margin: 1rem 0;
-	color: var(--sagicc-gray-500);
+	color: #1E293B;
+	box-shadow: 0 1px 3px rgba(0,0,0,0.04);
+}
+
+.editor-content blockquote p:last-child {
+	margin-bottom: 0;
+}
+
+/* Videos & Embeds */
+.editor-content .wp-block-embed,
+.editor-content figure.wp-block-embed {
+	margin: 2rem 0;
+	max-width: 100%;
+	width: 100%;
+	clear: both;
+}
+
+.editor-content .wp-block-embed__wrapper {
+	position: relative;
+	width: 100%;
+	aspect-ratio: 16 / 9;
+	border-radius: 1rem;
+	overflow: hidden;
+	background-color: #000;
+	box-shadow: 0 12px 30px -5px rgba(15, 23, 42, 0.15), 0 4px 10px -2px rgba(15, 23, 42, 0.05);
+}
+
+.editor-content .wp-block-embed iframe,
+.editor-content .wp-block-embed video,
+.editor-content .wp-block-embed object,
+.editor-content .wp-block-embed embed {
+	position: absolute;
+	top: 0;
+	left: 0;
+	width: 100%;
+	height: 100%;
+	border: 0;
+	border-radius: 1rem;
+}
+
+/* Code Blocks & Preformatted Text */
+.editor-content pre,
+.editor-content .wp-block-code,
+.editor-content .wp-block-preformatted {
+	background-color: #0F172A;
+	color: #F8FAFC;
+	font-family: 'Fira Code', 'JetBrains Mono', Consolas, Monaco, monospace;
+	font-size: 0.9375rem; /* 15px */
+	line-height: 1.65;
+	padding: 1.25rem 1.5rem;
+	border-radius: 0.875rem;
+	overflow-x: auto;
+	margin: 1.75rem 0;
+	border: 1px solid #1E293B;
+	box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.2);
+}
+
+.editor-content pre code,
+.editor-content .wp-block-code code {
+	background: transparent;
+	color: inherit;
+	padding: 0;
+	border-radius: 0;
+	border: none;
+	font-size: inherit;
+}
+
+/* Inline Code */
+.editor-content p code,
+.editor-content li code,
+.editor-content td code {
+	background-color: #F1F5F9;
+	color: #0F172A;
+	font-family: 'Fira Code', Consolas, monospace;
+	padding: 0.2em 0.45em;
+	border-radius: 0.375rem;
+	font-size: 0.88em;
+	font-weight: 600;
+	border: 1px solid #E2E8F0;
+}
+
+/* Images & Media */
+.editor-content img,
+.editor-content figure.wp-block-image img {
+	max-width: 100%;
+	height: auto;
+	border-radius: 0.875rem;
+	box-shadow: 0 8px 20px -4px rgba(0, 0, 0, 0.08);
+	display: block;
+}
+
+.editor-content figure.wp-block-image {
+	margin: 2rem 0;
+}
+
+.editor-content figcaption {
+	text-align: center;
+	font-size: 0.875rem;
+	color: var(--sagicc-gray-500, #64748B);
+	margin-top: 0.625rem;
+	font-style: italic;
+}
+
+/* Tables */
+.editor-content table,
+.editor-content .wp-block-table table {
+	width: 100%;
+	border-collapse: separate;
+	border-spacing: 0;
+	margin: 2rem 0;
+	border-radius: 0.875rem;
+	overflow: hidden;
+	border: 1px solid #E2E8F0;
+	box-shadow: 0 2px 5px rgba(0, 0, 0, 0.03);
+}
+
+.editor-content th {
+	background-color: #F8FAFC;
+	color: #0F172A;
+	font-weight: 700;
+	padding: 0.875rem 1rem;
+	text-align: left !important;
+	border-bottom: 2px solid #E2E8F0;
+}
+
+.editor-content td {
+	padding: 0.875rem 1rem;
+	border-bottom: 1px solid #F1F5F9;
+	color: #334155;
+}
+
+.editor-content tr:last-child td {
+	border-bottom: none;
+}
+
+/* Page Title Header in Single Guides & Posts */
+.sa-header-title {
+	font-family: var(--font-heading, 'Outfit', sans-serif) !important;
+	font-size: 2.5rem !important;
+	font-weight: 900 !important;
+	color: var(--sagicc-secondary, #0F172A) !important;
+	letter-spacing: -0.04em !important;
+	line-height: 1.2 !important;
+	margin-bottom: 1.5rem !important;
+	text-align: left !important;
+}
+
+/* LearnDash & Course Content Alignment */
+.sa-course-content,
+.sa-course-content > *,
+.sa-course-content .learndash-wrapper,
+.sa-course-content .ld-course-wrapper,
+.sa-course-content .ld-item-list,
+.sa-course-content .ld-section-heading {
+	text-align: left !important;
+	margin-left: 0 !important;
+	max-width: 100% !important;
 }
 
 /* ==========================================================================
@@ -169,3 +384,4 @@ div[id*="ajaxsearchlite"].asl_r .results {
 div[id*="ajaxsearchlite"].asl_r .results::-webkit-scrollbar {
 	display: none !important;
 }
+

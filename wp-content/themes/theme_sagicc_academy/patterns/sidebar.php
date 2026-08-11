@@ -114,7 +114,7 @@ $videos_url = $videos_archive ? $videos_archive : home_url( ($lang === 'en' ? '/
 $guides_archive = get_post_type_archive_link('guia');
 $guides_url = $guides_archive ? $guides_archive : home_url( ($lang === 'en' ? '/en' : '') . '/guia/' );
 
-$docs_url = 'https://docs.sagicc.co';
+$docs_url = 'https://technisupport.atlassian.net/wiki/spaces/S2MDU/overview';
 $interactive_url = '#';
 $certificates_url = trailingslashit($lang_home) . 'certificates/';
 $support_url = $t('dashboard.support_url');
