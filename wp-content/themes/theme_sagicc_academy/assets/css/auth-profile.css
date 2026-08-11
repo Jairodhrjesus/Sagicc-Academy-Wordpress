@@ -392,6 +392,21 @@
 	align-items: center;
 }
 
+/* Icon Margin Spacing Helpers */
+.me-1 { margin-right: 0.25rem !important; }
+.me-2 { margin-right: 0.5rem !important; }
+.me-3 { margin-right: 0.75rem !important; }
+.ms-3 { margin-left: 0.75rem !important; }
+
+.sa-alert-error i,
+.sa-alert-success i,
+.sa-section-title i,
+.sa-btn i,
+.sa-profile-user-details i {
+	margin-right: 0.5rem;
+}
+
+
 /* Simple & Structured Profile Header */
 .sa-profile-header-card {
 	background: var(--sagicc-white);

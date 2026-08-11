@@ -42,8 +42,8 @@ if ( ! defined( 'ABSPATH' ) ) {
 			</div>
 			<h2 class="sa-profile-user-name"><?php echo esc_html( $p['full_name'] ); ?></h2>
 			<div class="sa-profile-user-details">
-				<span><i class="fa-regular fa-envelope me-1"></i><?php echo esc_html( $p['email'] ); ?></span>
-				<span><i class="fa-regular fa-calendar me-1"></i><?php echo esc_html( $p['t']( 'profile.joined' ) ); ?> <?php echo esc_html( $p['registered_date'] ); ?></span>
+				<span><i class="fa-regular fa-envelope me-2"></i><?php echo esc_html( $p['email'] ); ?></span>
+				<span><i class="fa-regular fa-calendar me-2"></i><?php echo esc_html( $p['t']( 'profile.joined' ) ); ?> <?php echo esc_html( $p['registered_date'] ); ?></span>
 			</div>
 		</div>
 	</div>
