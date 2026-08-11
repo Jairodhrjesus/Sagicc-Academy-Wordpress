@@ -34,3 +34,18 @@ add_filter( 'pll_check_canonical_url', function ( $redirect_url ) {
 	}
 	return $redirect_url;
 }, 10, 2 );
+
+// Sobrescribir redirecciones de login (eliminar redirección a /tablero/)
+add_filter( 'login_redirect', function ( $redirect_to, $requested_redirect_to, $user ) {
+	if ( empty( $requested_redirect_to ) || strpos( $redirect_to, '/tablero' ) !== false ) {
+		return home_url( '/' );
+	}
+	return $redirect_to;
+}, 9999, 3 );
+
+add_filter( 'um_login_redirect_url', function ( $url, $id ) {
+	if ( empty( $url ) || strpos( $url, '/tablero' ) !== false ) {
+		return home_url( '/' );
+	}
+	return $url;
+}, 9999, 2 );
