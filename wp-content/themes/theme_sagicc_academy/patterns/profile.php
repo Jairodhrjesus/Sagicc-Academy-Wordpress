@@ -11,8 +11,21 @@ if (!is_user_logged_in()) {
 	exit;
 }
 
-$current_user = wp_get_current_user();
+$profile_username = get_query_var( 'profile_user' );
+$view_user = null;
+if ( ! empty( $profile_username ) ) {
+	$view_user = get_user_by( 'slug', $profile_username );
+	if ( ! $view_user ) {
+		$view_user = get_user_by( 'login', $profile_username );
+	}
+}
+if ( ! $view_user ) {
+	$view_user = wp_get_current_user();
+}
+
+$current_user = $view_user;
 $user_id = $current_user->ID;
+$is_own_profile = ( get_current_user_id() === $user_id );
 
 // Procesamiento de subida de avatar
 $upload_error = '';
@@ -201,6 +214,7 @@ if ( ! empty( $avatar_meta ) || ! empty( $um_avatar_meta ) ) {
 			</div>
 		</div>
 
+		<?php if ( $is_own_profile ) : ?>
 		<!-- Formulario de cambio de contraseña -->
 		<div class="sa-form-section">
 			<h3 class="sa-form-section-title"><?php echo esc_html($t('profile.change_password')); ?></h3>
@@ -244,5 +258,6 @@ if ( ! empty( $avatar_meta ) || ! empty( $um_avatar_meta ) ) {
 				</div>
 			</form>
 		</div>
+		<?php endif; ?>
 	</div>
 </div>

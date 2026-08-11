@@ -9,6 +9,7 @@
 	height: 100vh;
 	position: sticky;
 	top: 0;
+	z-index: 100;
 	background-color: var(--sagicc-white);
 	transition: all 0.3s ease-in-out;
 	font-family: var(--font-sans);

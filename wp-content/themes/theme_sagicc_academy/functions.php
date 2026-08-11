@@ -48,3 +48,15 @@ set_error_handler( function ( $errno, $errstr ) {
 	return false; // Pass all other errors to standard handler
 }, E_WARNING | E_USER_WARNING );
 
+// Register rewrite rules for profile URLs (/profile/{username}/ and /{lang}/profile/{username}/)
+add_action( 'init', function () {
+	add_rewrite_rule( '^profile/([^/]+)/?$', 'index.php?pagename=profile&profile_user=$matches[1]', 'top' );
+	add_rewrite_rule( '^(es|en)/profile/([^/]+)/?$', 'index.php?pagename=profile&profile_user=$matches[2]', 'top' );
+} );
+
+add_filter( 'query_vars', function ( $vars ) {
+	$vars[] = 'profile_user';
+	return $vars;
+} );
+
+
