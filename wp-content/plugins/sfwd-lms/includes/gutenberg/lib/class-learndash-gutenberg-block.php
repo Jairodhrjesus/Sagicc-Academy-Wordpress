@@ -138,13 +138,13 @@ if ( ! class_exists( 'LearnDash_Gutenberg_Block' ) ) {
 		 *
 		 * @since 2.5.9
 		 *
-		 * @param array    $block_attributes The block attributes.
-		 * @param string   $block_content    The block content.
-		 * @param WP_block $block            The block object.
+		 * @param array         $block_attributes The block attributes.
+		 * @param string        $block_content    The block content.
+		 * @param WP_Block|null $block            The block object.
 		 *
 		 * @return void The output is echoed.
 		 */
-		public function render_block( $block_attributes = array(), $block_content = '', WP_block $block = null ) {
+		public function render_block( $block_attributes = array(), $block_content = '', ?WP_Block $block = null ) {
 		}
 
 		/**
@@ -259,13 +259,26 @@ if ( ! class_exists( 'LearnDash_Gutenberg_Block' ) ) {
 					continue;
 				}
 
-				if ( ( empty( $key ) ) || ( '' == $val ) || ( is_null( $val ) ) ) {
+				if (
+					empty( $key )
+					|| is_null( $val )
+				) {
 					continue;
 				}
 
-				if ( ! empty( $shortcode_str ) ) {
+				// Boolean false must be serialized (e.g. autop="false"). '' == false is true in PHP, so the
+				// attribute was omitted and shortcode defaults (e.g. student autop true) applied incorrectly.
+				if ( is_bool( $val ) ) {
 					$shortcode_str .= ' ';
+					$shortcode_str .= $key . '="' . ( $val ? 'true' : 'false' ) . '"';
+					continue;
 				}
+
+				if ( '' === trim( $val ) ) {
+					continue;
+				}
+
+				$shortcode_str .= ' ';
 				$shortcode_str .= $key . '="' . esc_attr( $val ) . '"';
 			}
 			$shortcode_str .= ']';

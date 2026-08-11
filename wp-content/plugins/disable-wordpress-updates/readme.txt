@@ -3,7 +3,7 @@ Contributors: Alphawolf
 Donate link: https://www.schloebe.de/donate/
 Tags: disable updates, update, theme, update control
 Requires at least: 3.8
-Tested up to: 6.9.99
+Tested up to: 7.0.99
 Requires PHP: 7.4
 Stable tag: trunk
 License: GPLv2 or later
@@ -13,14 +13,17 @@ Disables the theme, plugin and core update checking, the related cronjobs, plugi
 
 == Description ==
 
-This plugin completely disables the theme, plugin and core update checking system in WordPress. The plugin prevents WordPress from
-checking for updates including cronjobs, and prevents any notifications from being displayed.
+This plugin completely disables the theme, plugin and core update checking system in WordPress. The plugin prevents WordPress from checking for updates including cronjobs, and prevents any notifications from being displayed.
 
-It's *very* important that you keep your WordPress theme, core and plugins up to date! If you don't, your blog or website could
-be **susceptible to security vulnerabilities** or performance issues.
+### 🛡️ New in 2.0: Security Mode
 
-If you use this plugin, make sure you keep yourself up to date with new releases of your active WordPress version, plugins
-and themes and update them as new versions are released (simply by deactivating this plugin for a short time).
+Want to keep your site patched without the risk of an automatic major-version upgrade? Enable the new **Security Mode** on its own settings page (*Settings → Disable Updates*) to restrict WordPress core auto-updates to **minor and security releases only**. Major version and development (nightly) core updates are blocked automatically, while plugin and theme auto-updates stay untouched.
+
+It is implemented purely through WordPress filters — **no wp-config.php edits required**. A clear warning is shown if the `WP_AUTO_UPDATE_CORE` constant is already defined elsewhere (host panel, mu-plugin, another plugin), and the admin-bar indicator turns orange while Security Mode is active so you can tell at a glance that updates are restricted rather than fully disabled.
+
+It's *very* important that you keep your WordPress theme, core and plugins up to date! If you don't, your blog or website could be **susceptible to security vulnerabilities** or performance issues.
+
+If you use this plugin, make sure you keep yourself up to date with new releases of your active WordPress version, plugins and themes and update them as new versions are released (simply by deactivating this plugin for a short time if Security Mode isn't enabled).
 
 [Developer on X](https://x.com/wpseek "Developer on X") [Developer on Bluesky](https://bsky.app/profile/cyberblitzbirne.bsky.social "Developer on Bluesky")
 
@@ -31,7 +34,7 @@ and themes and update them as new versions are released (simply by deactivating 
 
 = What can I do to be up to date with new releases of my WordPress version, plugins and themes? =
 
-Simply deativate the plugin for a short time. In case new versions are available you see the WordPress notifications.
+Simply deativate the plugin for a short time or enable the "Security Mode" in the plugin's settings. In case new versions are available you see the WordPress notifications.
 
 
 == Installation ==
@@ -51,6 +54,12 @@ None. :)
 
 
 == Changelog ==
+
+= 2.0.1 =
+* "Security Mode" fixes
+
+= 2.0.0 =
+* New: Optional "Security Mode" setting that enables WordPress core auto-updates for minor/security releases only (major & dev blocked) via the Settings API.
 
 = 1.9.0 =
 * WordPress 6.9 compatibility

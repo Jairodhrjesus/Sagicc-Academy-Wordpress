@@ -4,7 +4,7 @@
 
 namespace Composer\Autoload;
 
-class ComposerStaticInit510ff1a520818825f667f6361886077d
+class ComposerStaticInita29566f21d44c33bd76db2f25b2ad973
 {
     public static $prefixLengthsPsr4 = array (
         'L' =>
@@ -48,6 +48,8 @@ class ComposerStaticInit510ff1a520818825f667f6361886077d
         'LearnDash\\Core\\Infrastructure\\File_Protection\\Provider' => __DIR__ . '/../..' . '/src/Core/Infrastructure/File_Protection/Provider.php',
         'LearnDash\\Core\\Infrastructure\\Provider' => __DIR__ . '/../..' . '/src/Core/Infrastructure/Provider.php',
         'LearnDash\\Core\\Libraries\\Assets\\Provider' => __DIR__ . '/../..' . '/src/Core/Libraries/Assets/Provider.php',
+        'LearnDash\\Core\\Libraries\\Harbor\\Addon_Legacy_Licenses' => __DIR__ . '/../..' . '/src/Core/Libraries/Harbor/Addon_Legacy_Licenses.php',
+        'LearnDash\\Core\\Libraries\\Harbor\\Provider' => __DIR__ . '/../..' . '/src/Core/Libraries/Harbor/Provider.php',
         'LearnDash\\Core\\Libraries\\Provider' => __DIR__ . '/../..' . '/src/Core/Libraries/Provider.php',
         'LearnDash\\Core\\Licensing\\Provider' => __DIR__ . '/../..' . '/src/Core/Licensing/Provider.php',
         'LearnDash\\Core\\Licensing\\Status_Checker' => __DIR__ . '/../..' . '/src/Core/Licensing/Status_Checker.php',
@@ -91,6 +93,7 @@ class ComposerStaticInit510ff1a520818825f667f6361886077d
         'LearnDash\\Core\\Models\\Product' => __DIR__ . '/../..' . '/src/Core/Models/Product.php',
         'LearnDash\\Core\\Models\\Quiz' => __DIR__ . '/../..' . '/src/Core/Models/Quiz.php',
         'LearnDash\\Core\\Models\\Step' => __DIR__ . '/../..' . '/src/Core/Models/Step.php',
+        'LearnDash\\Core\\Models\\Steps\\Step_Visibility' => __DIR__ . '/../..' . '/src/Core/Models/Steps/Step_Visibility.php',
         'LearnDash\\Core\\Models\\Topic' => __DIR__ . '/../..' . '/src/Core/Models/Topic.php',
         'LearnDash\\Core\\Models\\Traits\\Has_Assignments' => __DIR__ . '/../..' . '/src/Core/Models/Traits/Has_Assignments.php',
         'LearnDash\\Core\\Models\\Traits\\Has_Materials' => __DIR__ . '/../..' . '/src/Core/Models/Traits/Has_Materials.php',
@@ -502,9 +505,9 @@ class ComposerStaticInit510ff1a520818825f667f6361886077d
     public static function getInitializer(ClassLoader $loader)
     {
         return \Closure::bind(function () use ($loader) {
-            $loader->prefixLengthsPsr4 = ComposerStaticInit510ff1a520818825f667f6361886077d::$prefixLengthsPsr4;
-            $loader->prefixDirsPsr4 = ComposerStaticInit510ff1a520818825f667f6361886077d::$prefixDirsPsr4;
-            $loader->classMap = ComposerStaticInit510ff1a520818825f667f6361886077d::$classMap;
+            $loader->prefixLengthsPsr4 = ComposerStaticInita29566f21d44c33bd76db2f25b2ad973::$prefixLengthsPsr4;
+            $loader->prefixDirsPsr4 = ComposerStaticInita29566f21d44c33bd76db2f25b2ad973::$prefixDirsPsr4;
+            $loader->classMap = ComposerStaticInita29566f21d44c33bd76db2f25b2ad973::$classMap;
 
         }, null, ClassLoader::class);
     }

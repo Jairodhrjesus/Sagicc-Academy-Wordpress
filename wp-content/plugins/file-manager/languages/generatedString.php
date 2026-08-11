@@ -1,4 +1,5 @@
 <?php
+if (!\defined('ABSPATH')) {exit;}
 /* THIS IS A GENERATED FILE. DO NOT EDIT DIRECTLY. */
 $i18n_strings = array(
     '404' => __('404', 'file-manager'),
@@ -31,9 +32,15 @@ $i18n_strings = array(
 
     'Failed to save permission' => __('Failed to save permission', 'file-manager'),
 
+    'Scope of these permissions' => __('Scope of these permissions', 'file-manager'),
+
+    'Controls what this user can do inside Bit File Manager only. Files reachable through the server (FTP, SSH, or other tools) are not affected.' => __('Controls what this user can do inside Bit File Manager only. Files reachable through the server (FTP, SSH, or other tools) are not affected.', 'file-manager'),
+
     'Path' => __('Path', 'file-manager'),
 
     'Enabled Commands' => __('Enabled Commands', 'file-manager'),
+
+    'These commands control what the user can do inside Bit File Manager only. They don\'t grant or change WordPress capabilities or the user\'s role.' => __('These commands control what the user can do inside Bit File Manager only. They don\'t grant or change WordPress capabilities or the user\'s role.', 'file-manager'),
 
     'Failed to update permission' => __('Failed to update permission', 'file-manager'),
 

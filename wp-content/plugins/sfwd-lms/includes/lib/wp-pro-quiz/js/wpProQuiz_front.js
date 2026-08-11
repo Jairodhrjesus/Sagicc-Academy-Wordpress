@@ -1956,6 +1956,15 @@ const localStorage = window.localStorage || {};
 								return false;
 							}
 						});
+
+						/**
+						 * The saved question may no longer be in the rendered set (e.g. a
+						 * different random subset on resume); fall back to a valid question so
+						 * currentQuestion is never null.
+						 */
+						if (!currentQuestion || !currentQuestion.length) {
+							currentQuestion = $listItem.eq(0);
+						}
 					} else {
 						if (config.ld_script_debug == true) {
 							console.log(
@@ -2267,10 +2276,7 @@ const localStorage = window.localStorage || {};
 				}
 
 				// We hide the current question IF it is set.
-				if (
-					typeof currentQuestion !== 'undefined' &&
-					currentQuestion.length > 0
-				) {
+				if (currentQuestion && currentQuestion.length > 0) {
 					globalElements.questionList.children().each(function () {
 						if (
 							$(this).data('question-meta').question_pro_id !==
@@ -2281,6 +2287,13 @@ const localStorage = window.localStorage || {};
 						}
 					});
 				}
+
+				/**
+				 * Defensive: a stale resume reference may pass a null/undefined target.
+				 * Normalize to an empty jQuery object so the end-of-quiz handling below runs
+				 * instead of throwing on a missing question.
+				 */
+				obj = obj || $();
 
 				if (
 					!obj.length &&
@@ -2326,7 +2339,9 @@ const localStorage = window.localStorage || {};
 				}
 
 				//globalElements.questionList.children().hide();
-				currentQuestion.hide();
+				if (currentQuestion && currentQuestion.length) {
+					currentQuestion.hide();
+				}
 
 				currentQuestion = obj.show();
 
@@ -5048,6 +5063,9 @@ const localStorage = window.localStorage || {};
 						} else if (nextQuestion == 0 && lastQuestion > 0) {
 							nextQuestion = lastQuestion;
 						}
+
+						let resumed = false;
+
 						jQuery(globalElements.listItems).each(function (
 							index,
 							listItem
@@ -5070,6 +5088,8 @@ const localStorage = window.localStorage || {};
 									.find(globalNames.questionList)
 									.data('question_id');
 
+								resumed = true;
+
 								questionTimer.questionStart(questionId);
 								plugin.methode.showQuestionObject(
 									currentQuestion
@@ -5081,6 +5101,16 @@ const localStorage = window.localStorage || {};
 							// 	console.log("moveToNextUnansweredQuestion: not match: listItem[%o]", listItem);
 							// }
 						});
+
+						/**
+						 * The saved question is not in the rendered set (e.g. a different
+						 * random subset on resume); fall back to the first question so the
+						 * quiz never resumes with a null current question.
+						 */
+						if (!resumed) {
+							currentQuestion = globalElements.listItems.eq(0);
+							plugin.methode.showQuestionObject(currentQuestion);
+						}
 					}
 				}
 			},

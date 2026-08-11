@@ -7,6 +7,8 @@
  * @package LearnDash\Quiz\Reports
  */
 
+use LearnDash\Core\Utilities\Cast;
+
 if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
@@ -152,222 +154,279 @@ if ( ( ! class_exists( 'Learndash_Admin_Data_Reports_Quizzes' ) ) && ( class_exi
 		}
 
 		/**
-		 * Class method for the AJAX update logic
-		 * This function will determine what users need to be converted. Then the course and quiz functions
-		 * will be called to convert each individual user data set.
+		 * Handles the AJAX export request.
+		 *
+		 * Builds the users list, writes CSV headers, queues the first background chunk via
+		 * Action Scheduler, and returns a queued-state snapshot. Subsequent rounds are no
+		 * longer driven by the browser — Action Scheduler chains chunks server-side via
+		 * `process_export_chunk()`, and progress (plus the final download link) surfaces through
+		 * admin notices. A request received while an export is already running short-circuits to
+		 * a running-state snapshot.
 		 *
 		 * @since 2.3.0
+		 * @since 5.1.6 Iteration moved to Action Scheduler; this method only queues the export now.
 		 *
-		 * @param  array $data Post data from AJAX call.
+		 * @param array $data Post data from AJAX call.
 		 *
-		 * @return array $data Post data from AJAX call
+		 * @return array Response payload describing the queued export.
 		 */
 		public function process_report_action( $data = array() ) {
-			global $wpdb;
-
-			$this->init_process_times();
-
-			if ( ! isset( $data['total_count'] ) ) {
-				$data['total_count'] = 0;
+			if (
+				empty( $data['nonce'] )
+				|| ! wp_verify_nonce( $data['nonce'], 'learndash-data-reports-' . $this->data_slug . '-' . get_current_user_id() )
+			) {
+				return $data;
 			}
 
-			if ( ! isset( $data['result_count'] ) ) {
-				$data['result_count'] = 0;
+			require_once LEARNDASH_LMS_LIBRARY_DIR . '/parsecsv.lib.php';
+
+			$this->csv_parse     = new lmsParseCSV();
+			$this->transient_key = $this->data_slug . '_' . $data['nonce'];
+
+			// Do not start a second export while one is already queued or running — the running
+			// export's progress notice already covers it.
+			$engine = Learndash_Admin_Background_Export::get_instance();
+
+			if (
+				$engine instanceof Learndash_Admin_Background_Export
+				&& $engine->is_export_in_progress()
+			) {
+				return array(
+					'status' => 'running',
+					'slug'   => $this->data_slug,
+				);
 			}
 
-			if ( ! isset( $data['progress_percent'] ) ) {
-				$data['progress_percent'] = 0;
+			$this->transient_data = array();
+
+			if ( ! empty( $data['filters'] ) ) {
+				$this->transient_data = wp_parse_args( $this->transient_data, $data['filters'] );
+			} elseif ( ! empty( $data['group_id'] ) ) {
+				$group_id = intval( $data['group_id'] );
+
+				$this->transient_data['users_ids']  = learndash_get_groups_user_ids( $group_id );
+				$this->transient_data['course_ids'] = learndash_group_enrolled_courses( $group_id );
+
+				if ( empty( $this->transient_data['course_ids'] ) ) {
+					return $data;
+				}
+			} else {
+				$this->transient_data['posts_ids'] = '';
+				$this->transient_data['users_ids'] = learndash_get_report_user_ids();
 			}
 
-			if ( ! isset( $data['progress_label'] ) ) {
-				$data['progress_label'] = '';
+			if (
+				! isset( $this->transient_data['users_ids'] )
+				|| ! is_array( $this->transient_data['users_ids'] )
+			) {
+				$this->transient_data['users_ids'] = array();
 			}
 
-			$_doing_init = false;
+			$this->transient_data['users_ids'] = array_values( $this->transient_data['users_ids'] );
+
+			$total_count = count( $this->transient_data['users_ids'] );
+
+			$this->transient_data['total_users'] = $total_count;
+			$this->transient_data['total_count'] = $total_count;
+			$this->transient_data['offset']      = 0;
+
+			$this->set_report_filenames( $data );
+			$this->report_filename = $this->transient_data['report_filename'];
+
+			// Clear out any previous file.
+			// phpcs:ignore WordPress.WP.AlternativeFunctions.file_system_read_fopen
+			$reports_fp = fopen( $this->report_filename, 'w' );
+			if ( $reports_fp ) {
+				// phpcs:ignore WordPress.WP.AlternativeFunctions.file_system_read_fclose
+				fclose( $reports_fp );
+			}
+
+			$this->send_report_headers_to_csv();
+
+			$this->set_option_cache( $this->transient_key, $this->transient_data );
+
+			if ( $engine instanceof Learndash_Admin_Background_Export ) {
+				$engine->enqueue_export_chunk_task( $this->transient_key, $this->data_slug );
+			}
+
+			return array(
+				'status'        => 'queued',
+				'slug'          => $this->data_slug,
+				'transient_key' => $this->transient_key,
+			);
+		}
+
+		/**
+		 * Processes one chunk of users for the in-progress quiz export.
+		 *
+		 * Invoked by the Action Scheduler dispatcher in `Learndash_Admin_Background_Export::handle_export_chunk_task()`.
+		 * Loads the export state from the transient, processes a single chunk of users in
+		 * one batched activity query, appends the resulting rows to the CSV, and persists
+		 * the remaining work back into the transient. Returns whether more chunks remain
+		 * so the dispatcher knows whether to chain another scheduled action.
+		 *
+		 * @since 5.1.6
+		 *
+		 * @param string $transient_key Transient key holding the export state.
+		 *
+		 * @return bool True when more users remain to process; false when the export is done.
+		 */
+		public function process_export_chunk( string $transient_key ): bool {
+			if ( empty( $transient_key ) ) {
+				return false;
+			}
+
+			$this->transient_key  = $transient_key;
+			$this->transient_data = $this->get_transient( $transient_key );
+
+			if (
+				! is_array( $this->transient_data )
+				|| empty( $this->transient_data['users_ids'] )
+				|| ! is_array( $this->transient_data['users_ids'] )
+				|| empty( $this->transient_data['report_filename'] )
+			) {
+				return false;
+			}
+
+			$offset      = isset( $this->transient_data['offset'] ) ? (int) $this->transient_data['offset'] : 0;
+			$total_users = count( $this->transient_data['users_ids'] );
+
+			if ( $offset >= $total_users ) {
+				return false;
+			}
+
+			if ( empty( $this->data_headers ) ) {
+				$this->set_report_headers();
+			}
+
+			$this->report_filename = $this->transient_data['report_filename'];
 
 			require_once LEARNDASH_LMS_LIBRARY_DIR . '/parsecsv.lib.php';
 
 			$this->csv_parse = new lmsParseCSV();
 
-			if ( ( isset( $data['nonce'] ) ) && ( ! empty( $data['nonce'] ) ) ) {
-				if ( wp_verify_nonce( $data['nonce'], 'learndash-data-reports-' . $this->data_slug . '-' . get_current_user_id() ) ) {
-					$this->transient_key = $this->data_slug . '_' . $data['nonce'];
+			/** This filter is documented in includes/admin/classes-data-reports-actions/class-learndash-admin-data-reports-user-courses.php */
+			$chunk_size = Cast::to_int( apply_filters( 'learndash_report_user_activity_export_chunk_size', 100 ) );
 
-					// On the 'init' (the first call via AJAX we load up the transient with the user_ids).
-					if ( ( isset( $data['init'] ) ) && ( 1 == $data['init'] ) ) {
-						$_doing_init = true;
+			if ( $chunk_size < 1 ) {
+				$chunk_size = 100;
+			}
 
-						unset( $data['init'] );
+			$activity_query_args = array(
+				'post_types'      => LDLMS_Post_Types::get_post_type_slug( LDLMS_Post_Types::QUIZ ),
+				'activity_types'  => 'quiz',
+				'activity_status' => array( 'IN_PROGRESS', 'COMPLETED' ),
+				'orderby_order'   => 'users.display_name, posts.post_title ASC',
+				'date_format'     => 'F j, Y H:i:s',
+				'per_page'        => '',
+				'time_start'      => '',
+				'time_end'        => '',
+			);
 
-						$this->transient_data = array();
+			if ( ! empty( $this->transient_data['posts_ids'] ) ) {
+				$activity_query_args['post_ids'] = $this->transient_data['posts_ids'];
+			}
 
-						if ( ( isset( $data['filters'] ) ) && ( ! empty( $data['filters'] ) ) ) {
+			if ( ! empty( $this->transient_data['course_ids'] ) ) {
+				$activity_query_args['course_ids'] = $this->transient_data['course_ids'];
+			}
 
-							$this->transient_data = wp_parse_args( $this->transient_data, $data['filters'] );
-						} else {
+			if ( ! empty( $this->transient_data['time_start'] ) ) {
+				$activity_query_args['time_start'] = esc_attr( $this->transient_data['time_start'] );
+			}
 
-							if ( ( isset( $data['group_id'] ) ) && ( ! empty( $data['group_id'] ) ) ) {
-								$this->transient_data['users_ids']  = learndash_get_groups_user_ids( intval( $data['group_id'] ) );
-								$this->transient_data['course_ids'] = learndash_group_enrolled_courses( intval( intval( $data['group_id'] ) ) );
-								if ( empty( $this->transient_data['course_ids'] ) ) {
-									return $data;
-								}
-							} else {
-								$this->transient_data['posts_ids'] = '';
-								$this->transient_data['users_ids'] = learndash_get_report_user_ids();
-							}
-						}
+			if ( ! empty( $this->transient_data['time_end'] ) ) {
+				$activity_query_args['time_end'] = esc_attr( $this->transient_data['time_end'] );
+			}
 
-						$this->transient_data['total_users'] = count( $this->transient_data['users_ids'] );
+			// Advance an integer offset through the immutable users list. Persisting only the
+			// offset keeps each chunk's transient write to a handful of bytes instead of
+			// rewriting the full (potentially hundreds-of-thousands-long) ID array every chunk.
+			$chunk = array_slice( $this->transient_data['users_ids'], $offset, $chunk_size );
 
-						$this->set_report_filenames( $data );
-						$this->report_filename = $this->transient_data['report_filename'];
+			$report_users = array();
 
-						$data['report_download_link'] = $this->transient_data['report_url'];
-						$data['total_count']          = $this->transient_data['total_users'];
+			foreach (
+				get_users(
+					array(
+						'include' => $chunk,
+						'fields'  => 'all',
+					)
+				) as $u
+			) {
+				$report_users[ (int) $u->ID ] = $u;
+			}
 
-						// Clear out any previous file.
-						// phpcs:ignore WordPress.WP.AlternativeFunctions.file_system_read_fopen
-						$reports_fp = fopen( $this->report_filename, 'w' );
-						// phpcs:ignore WordPress.WP.AlternativeFunctions.file_system_read_fclose
-						fclose( $reports_fp );
+			$activity_query_args['user_ids'] = $chunk;
 
-						$this->set_option_cache( $this->transient_key, $this->transient_data );
+			$user_courses_reports = learndash_reports_get_activity( $activity_query_args );
 
-						$this->send_report_headers_to_csv();
+			$course_progress_data = array();
 
-					} else {
-						$this->transient_data  = $this->get_transient( $this->transient_key );
-						$this->report_filename = $this->transient_data['report_filename'];
+			if ( ! empty( $user_courses_reports['results'] ) ) {
+				foreach ( $user_courses_reports['results'] as $result ) {
+					$report_user = $report_users[ (int) $result->user_id ] ?? null;
+
+					if ( ! $report_user ) {
+						continue;
 					}
 
-					if ( ! empty( $this->transient_data['users_ids'] ) ) {
+					$row = array();
 
-						// If we are doing the initial 'init' then we return so we can show the progress meter.
-						if ( true !== $_doing_init ) {
-
-							$activity_query_args = array(
-								'post_types'      => 'sfwd-quiz',
-								'activity_types'  => 'quiz',
-								'activity_status' => array( 'IN_PROGRESS', 'COMPLETED' ),
-								'orderby_order'   => 'users.display_name, posts.post_title ASC',
-								'date_format'     => 'F j, Y H:i:s',
-								'per_page'        => '',
-								'time_start'      => '',
-								'time_end'        => '',
+					foreach ( $this->data_headers as $header_key => $header_data ) {
+						if (
+							isset( $header_data['display'] )
+							&& ! empty( $header_data['display'] )
+							&& is_callable( $header_data['display'] )
+						) {
+							$row[ $header_key ] = call_user_func_array(
+								$header_data['display'],
+								array(
+									$header_data['default'],
+									$header_key,
+									$result,
+									$report_user,
+								)
 							);
-
-							$course_progress_data = array();
-
-							foreach ( $this->transient_data['users_ids'] as $user_id_idx => $user_id ) {
-
-								unset( $this->transient_data['users_ids'][ $user_id_idx ] );
-								$this->set_option_cache( $this->transient_key, $this->transient_data );
-
-								$report_user = get_user_by( 'id', $user_id );
-								if ( false !== $report_user ) {
-
-									$activity_query_args['user_ids'] = array( $user_id );
-
-									if ( ( isset( $this->transient_data['posts_ids'] ) ) && ( ! empty( $this->transient_data['posts_ids'] ) ) ) {
-										$post_ids                        = $this->transient_data['posts_ids'];
-										$activity_query_args['post_ids'] = $post_ids;
-									}
-
-									if ( ( isset( $this->transient_data['course_ids'] ) ) && ( ! empty( $this->transient_data['course_ids'] ) ) ) {
-										$activity_query_args['course_ids'] = $this->transient_data['course_ids'];
-									}
-
-									if ( ( isset( $this->transient_data['time_start'] ) ) && ( ! empty( $this->transient_data['time_start'] ) ) ) {
-										$activity_query_args['time_start'] = esc_attr( $this->transient_data['time_start'] );
-									}
-
-									if ( ( isset( $this->transient_data['time_end'] ) ) && ( ! empty( $this->transient_data['time_end'] ) ) ) {
-										$activity_query_args['time_end'] = esc_attr( $this->transient_data['time_end'] );
-									}
-
-									$user_courses_reports = learndash_reports_get_activity( $activity_query_args );
-									if ( ! empty( $user_courses_reports['results'] ) ) {
-										foreach ( $user_courses_reports['results'] as $result ) {
-
-											/**
-											 * Added LD 3.2.0 - PP-204
-											 * Missing Activity meta data. As a secondary pull from the user quiz meta.
-											 */
-											if ( ( ! property_exists( $result, 'activity_meta' ) ) || ( empty( $result->activity_meta ) ) ) {
-												if ( ! empty( $user_quiz_meta ) ) { // @phpstan-ignore-line -- Not sure where this came from but don't want to remove just yet.
-													foreach ( $user_quiz_meta as $user_meta_item ) {
-														if ( ( absint( $result->post_id ) === absint( $user_meta_item['quiz'] ) ) && ( absint( $result->activity_updated ) === absint( $user_meta_item['time'] ) ) && ( absint( $result->activity_started ) === absint( $user_meta_item['started'] ) ) ) {
-															$result->activity_meta = $user_meta_item;
-															break;
-														}
-													}
-												}
-											}
-
-											$row = array();
-
-											foreach ( $this->data_headers as $header_key => $header_data ) {
-
-												if ( ( isset( $header_data['display'] ) ) && ( ! empty( $header_data['display'] ) ) && ( is_callable( $header_data['display'] ) ) ) {
-													$row[ $header_key ] = call_user_func_array(
-														$header_data['display'],
-														array(
-															$header_data['default'],
-															$header_key,
-															$result,
-															$report_user,
-														)
-													);
-												} elseif ( ( isset( $header_data['default'] ) ) && ( ! empty( $header_data['default'] ) ) ) {
-													$row[ $header_key ] = $header_data['default'];
-												} else {
-													$row[ $header_key ] = '';
-												}
-											}
-
-											if ( ! empty( $row ) ) {
-												$course_progress_data[] = $row;
-											}
-										}
-									}
-								}
-
-								if ( $this->out_of_timer() ) {
-									break;
-								}
-							}
-
-							if ( ! empty( $course_progress_data ) ) {
-								$this->csv_parse->file            = $this->report_filename;
-								$this->csv_parse->output_filename = $this->report_filename;
-
-								// legacy.
-								/** This filter is documented in includes/class-ld-lms.php */
-								$this->csv_parse = apply_filters( 'learndash_csv_object', $this->csv_parse, 'quizzes' );
-
-								/** This filter is documented in includes/class-ld-lms.php */
-								$this->csv_parse = apply_filters( 'learndash_csv_object', $this->csv_parse, $this->data_slug );
-								/** This filter is documented in includes/admin/classes-data-reports-actions/class-learndash-admin-data-reports-user-courses.php */
-								$course_progress_data = apply_filters( 'learndash_csv_data', $course_progress_data, $this->data_slug );
-
-								$this->csv_parse->save( $this->report_filename, $course_progress_data, true, wp_list_pluck( $this->data_headers, 'label' ) );
-							}
+						} elseif (
+							isset( $header_data['default'] )
+							&& ! empty( $header_data['default'] )
+						) {
+							$row[ $header_key ] = $header_data['default'];
+						} else {
+							$row[ $header_key ] = '';
 						}
+					}
 
-						$data['result_count']     = $data['total_count'] - count( $this->transient_data['users_ids'] );
-						$data['progress_percent'] = ( $data['result_count'] / $data['total_count'] ) * 100;
-						$data['progress_label']   = sprintf(
-							// translators: placeholders: result count, total count.
-							esc_html_x( '%1$d of %2$s Users', 'placeholders: result count, total count', 'learndash' ),
-							$data['result_count'],
-							$data['total_count']
-						);
+					if ( ! empty( $row ) ) {
+						$course_progress_data[] = $row;
 					}
 				}
 			}
 
-			return $data;
+			if ( ! empty( $course_progress_data ) ) {
+				$this->csv_parse->file            = $this->report_filename;
+				$this->csv_parse->output_filename = $this->report_filename;
+
+				// legacy.
+				/** This filter is documented in includes/class-ld-lms.php */
+				$this->csv_parse = apply_filters( 'learndash_csv_object', $this->csv_parse, 'quizzes' );
+
+				/** This filter is documented in includes/class-ld-lms.php */
+				$this->csv_parse = apply_filters( 'learndash_csv_object', $this->csv_parse, $this->data_slug );
+
+				/** This filter is documented in includes/admin/classes-data-reports-actions/class-learndash-admin-data-reports-user-courses.php */
+				$course_progress_data = apply_filters( 'learndash_csv_data', $course_progress_data, $this->data_slug );
+
+				$this->csv_parse->save( $this->report_filename, $course_progress_data, true, wp_list_pluck( $this->data_headers, 'label' ) );
+			}
+
+			// Advance the offset by the processed chunk size and persist only that integer back.
+			$this->transient_data['offset'] = $offset + count( $chunk );
+
+			$this->set_option_cache( $this->transient_key, $this->transient_data );
+
+			return $this->transient_data['offset'] < $total_users;
 		}
 
 		/**

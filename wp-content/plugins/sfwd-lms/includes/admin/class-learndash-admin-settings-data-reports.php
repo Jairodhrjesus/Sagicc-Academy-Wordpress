@@ -255,10 +255,34 @@ if ( ! class_exists( 'Learndash_Admin_Settings_Data_Reports' ) ) {
 				LEARNDASH_SCRIPT_VERSION_TOKEN,
 				true
 			);
+			wp_localize_script(
+				'learndash-admin-settings-data-reports-script',
+				'learndashDataReports',
+				array(
+					'messages' => self::get_export_notice_messages(),
+				)
+			);
 			$learndash_assets_loaded['scripts']['learndash-admin-settings-data-reports-script'] = __FUNCTION__;
 
 			$this->init_report_actions();
 
+		}
+
+		/**
+		 * Returns the export notice strings shared by the Reports settings page and the
+		 * ProPanel widget, so the wording lives in one place instead of being repeated
+		 * in each script.
+		 *
+		 * @since 5.1.6
+		 *
+		 * @return array{ export_queued: string, dismiss_notice: string, export_failed_start: string } Notice keys mapped to translated, HTML-safe strings.
+		 */
+		public static function get_export_notice_messages(): array {
+			return array(
+				'export_queued'       => esc_html__( 'Your report is being processed in the background. You can safely leave or close this page; the download link will appear here as a notice once the export finishes.', 'learndash' ),
+				'dismiss_notice'      => esc_html__( 'Dismiss this notice.', 'learndash' ),
+				'export_failed_start' => esc_html__( 'The export could not be started. Please try again.', 'learndash' ),
+			);
 		}
 
 		/**
@@ -463,10 +487,30 @@ if ( ! class_exists( 'Learndash_Admin_Settings_Data_Reports' ) ) {
 							dirname( $ld_transient_filename )
 						);
 
-						$transient_fp = fopen( $ld_transient_filename, 'w' ); // phpcs:ignore WordPress.WP.AlternativeFunctions.file_system_read_fopen
-						if ( $transient_fp ) {
-							fwrite( $transient_fp, serialize( $transient_data ) ); // phpcs:ignore WordPress.PHP.DiscouragedPHPFunctions.serialize_serialize, WordPress.WP.AlternativeFunctions.file_system_read_fwrite
-							fclose( $transient_fp ); // phpcs:ignore WordPress.WP.AlternativeFunctions.file_system_read_fclose
+						// Atomic write: stream to a unique temp file then rename into place.
+						// Writing directly to $ld_transient_filename truncates the live file before
+						// the payload is fully written, leaving a window where concurrent readers see
+						// an empty file and the export status endpoint reports "Export not found"
+						// mid-run. WP_Filesystem::move() wraps a POSIX rename, which is atomic on the
+						// file systems WordPress supports, so readers either see the previous full file
+						// or the new one — never a half-written intermediate.
+						global $wp_filesystem;
+
+						if ( ! $wp_filesystem ) {
+							require_once ABSPATH . 'wp-admin/includes/file.php';
+							WP_Filesystem();
+						}
+
+						if ( $wp_filesystem ) {
+							$tmp_filename  = $ld_transient_filename . '.tmp.' . uniqid( '', true );
+							$serialized    = serialize( $transient_data ); // phpcs:ignore WordPress.PHP.DiscouragedPHPFunctions.serialize_serialize -- maybe_unserialize() on the read side requires PHP serialize format; JSON would not round-trip stored objects.
+							$wrote_tmp     = $wp_filesystem->put_contents( $tmp_filename, $serialized, FS_CHMOD_FILE );
+
+							if ( $wrote_tmp ) {
+								if ( ! $wp_filesystem->move( $tmp_filename, $ld_transient_filename, true ) ) {
+									$wp_filesystem->delete( $tmp_filename );
+								}
+							}
 						}
 					} else {
 						update_option( $options_key, $transient_data );
@@ -501,7 +545,7 @@ add_action(
  */
 function learndash_data_reports_ajax() { // phpcs:ignore Universal.Files.SeparateFunctionsFromOO.Mixed -- TODO: Move this function.
 	if (
-		! current_user_can( 'read' )
+		! current_user_can( LEARNDASH_ADMIN_CAPABILITY_CHECK )
 		|| empty( $_POST['data'] )
 		|| empty( $_POST['data']['nonce'] )
 	) {

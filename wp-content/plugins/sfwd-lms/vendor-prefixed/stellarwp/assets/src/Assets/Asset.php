@@ -298,12 +298,15 @@ class Asset {
 	/**
 	 * Constructor.
 	 *
+	 * @since 1.0.0
+	 * @since 1.5.2 Added nullable type hints for the version and root path parameters.
+	 *
 	 * @param string      $slug      The asset slug.
 	 * @param string      $file      The asset file path.
 	 * @param string|null $version   The asset version.
 	 * @param string|null $root_path The path to the root of the plugin.
 	 */
-	public function __construct( string $slug, string $file, string $version = null, string $root_path = null ) {
+	public function __construct( string $slug, string $file, ?string $version = null, ?string $root_path = null ) {
 		$this->slug      = sanitize_key( $slug );
 		$this->file      = $file;
 		$this->version   = $version ?? Config::get_version();
@@ -340,12 +343,15 @@ class Asset {
 	/**
 	 * Registers an asset.
 	 *
+	 * @since 1.0.0
+	 * @since 1.5.2 Added nullable type hints for the version and root path parameters.
+	 *
 	 * @param string      $slug      The asset slug.
 	 * @param string      $file      The asset file path.
 	 * @param string|null $version   The asset version.
 	 * @param string|null $root_path The path to the root of the plugin.
 	 */
-	public static function add( string $slug, string $file, string $version = null, $root_path = null ) {
+	public static function add( string $slug, string $file, ?string $version = null, ?string $root_path = null ) {
 		return Assets::init()->add( new self( $slug, $file, $version, $root_path ) );
 	}
 
@@ -553,14 +559,6 @@ class Asset {
 	 * @return string
 	 */
 	protected function build_min_asset_url( $original_url ): string {
-		if (
-			0 === strpos( $original_url, 'http://' ) ||
-			0 === strpos( $original_url, 'https://' ) ||
-			0 === strpos( $original_url, '//' )
-		) {
-			return $original_url;
-		}
-
 		// debt: This is too much of a copy paste from build_asset_url. We should refactor this.
 		$resource                = $this->get_file();
 		$root_path               = $this->get_root_path();
@@ -630,6 +628,10 @@ class Asset {
 			$minified_file_path = preg_replace( '#(.*).(js|css)#', '$1.min.$2', $resource_path . $resource );
 		}
 
+		if ( preg_match( '#https?://#i', $resource ) || preg_match( '#https?://#i', $original_url ) ) {
+			return $original_url;
+		}
+
 		$script_debug = defined( 'SCRIPT_DEBUG' ) && Utils::is_truthy( SCRIPT_DEBUG );
 
 		if ( $script_debug && is_file( wp_normalize_path( $root_path . $resource_path . $resource ) ) ) {
@@ -638,7 +640,7 @@ class Asset {
 
 		$minified_abs_file_path = wp_normalize_path( $root_path . $minified_file_path );
 
-		if ( ! is_file( $minified_abs_file_path ) ) {
+		if ( preg_match( '#https?://#i', $minified_abs_file_path ) || ! is_file( $minified_abs_file_path ) ) {
 			return $original_url;
 		}
 
@@ -1198,18 +1200,9 @@ class Asset {
 			return false;
 		}
 
-		$file = $this->get_file();
-		if (
-			0 === strpos( $file, 'http://' ) ||
-			0 === strpos( $file, 'https://' ) ||
-			0 === strpos( $file, '//' )
-		) {
-			return false;
-		}
-
 		$asset_file_path = $this->get_asset_file_path();
 
-		if ( empty( $asset_file_path ) ) {
+		if ( empty( $asset_file_path ) || preg_match( '#https?://#i', $asset_file_path ) ) {
 			return false;
 		}
 

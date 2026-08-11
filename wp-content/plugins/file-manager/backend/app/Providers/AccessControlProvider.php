@@ -12,6 +12,21 @@ use Exception;
 
 class AccessControlProvider
 {
+    /**
+     * Navigation/utility commands that read no file content and mutate nothing.
+     * The gate binds to `*.pre` (fires for every command), so these are passed
+     * explicitly to keep tree/URL browsing working for restricted users.
+     */
+    public const EXEMPT_COMMANDS = ['open', 'search', 'subdirs', 'url', 'abort', 'callback'];
+
+    /**
+     * Commands the connector-level backstop must NOT enforce. `file` (read) is
+     * authorized only by the `*.pre` bind: its path-aware `download`-grant check
+     * needs the resolved target volume, which does not exist until run() builds
+     * elFinder — a connector check that lacks those arguments can only wrongly deny it.
+     */
+    public const CONNECTOR_UNCHECKED_COMMANDS = ['file'];
+
     public $settings;
 
     private $maliciousPatterns = [
@@ -73,9 +88,22 @@ class AccessControlProvider
         return ! (strpos($name, '.') === 0 && !$this->settings->isHiddenFolderAllowed());
     }
 
+    /**
+     * Whether the connector may enforce this command before elFinder runs.
+     * The authoritative, argument-complete gate is the `*.pre` bind inside run().
+     *
+     * @param string $command
+     *
+     * @return bool
+     */
+    public function isConnectorEnforceable($command)
+    {
+        return $command !== '' && !\in_array($command, self::CONNECTOR_UNCHECKED_COMMANDS, true);
+    }
+
     public function checkPermission($command, ...$args)
     {
-        if (\in_array($command, ['open', 'search'])) {
+        if (\in_array($command, self::EXEMPT_COMMANDS, true)) {
             return;
         }
 
@@ -88,21 +116,30 @@ class AccessControlProvider
             $cmd = 'edit';
         }
 
-        if (
-            $this->isNotRequiredCommandForAllPermission($cmd, $permissionProvider)
-             && !$permissionProvider->currentUserCanRun($cmd)) {
-            $error = wp_sprintf(
-                // translators: 1: elFInder Command
-                __(
-                    'You are not authorized to run this command [ %s ] on file manager',
-                    'file-manager'
-                ),
-                $cmd
-            );
-        }
+        if ($this->isNotRequiredCommandForAllPermission($cmd, $permissionProvider)) {
+            $elfinder = isset($args[1])    && $args[1] instanceof elFinder ? $args[1] : null;
+            $paths    = $elfinder !== null && isset($args[0]) && \is_array($args[0])
+                ? $this->resolveInvolvedPaths($args[0], $elfinder)
+                : [];
 
-        if ($command == 'file' && $this->isFileAllowedToOpen($args)) {
-            $error = '';
+            if (!empty($paths) && \in_array($cmd, $permissionProvider->allCommands(), true)) {
+                // Path-aware check is authoritative for managed commands when targets resolve.
+                $authorized = $this->isCommandAllowedForPaths($cmd, $paths, $permissionProvider);
+            } else {
+                // Non-managed command or no resolvable target: coarse union (admin + capability filter).
+                $authorized = $permissionProvider->currentUserCanRun($cmd);
+            }
+
+            if (!$authorized) {
+                $action = $permissionProvider->commandLabel($cmd);
+                $error  = $action !== ''
+                    ? wp_sprintf(
+                        // translators: 1: human-readable action, e.g. "edit files"
+                        __("You don't have permission to %s here.", 'file-manager'),
+                        $action
+                    )
+                    : __("You don't have permission to do that here.", 'file-manager');
+            }
         }
 
         try {
@@ -223,24 +260,50 @@ class AccessControlProvider
         }
     }
 
-    private function isFileAllowedToOpen($args)
+    public function resolveInvolvedPaths(array $cmdArgs, $elfinder): array
     {
-        if (isset($args[1]) && $args[1] instanceof elFinder) {
-            $volume         = $args[1]->getVolume($args[0]['target']);
-            $file           = $volume->getPath($args[0]['target']);
-            $fileName       = wp_basename($file);
-            $fileTypeAndExt = wp_check_filetype_and_ext($file, $fileName);
-            if (isset($fileTypeAndExt['ext'], $fileTypeAndExt['type'])) {
-                $fileType        = str_replace('/' . $fileTypeAndExt['ext'], '', $fileTypeAndExt['type']);
-                $enabledFileType = Plugin::instance()->permissions()->getEnabledFileType();
+        $hashes = [];
 
-                if (\in_array($fileType, $enabledFileType)) {
-                    return true;
+        foreach (['target', 'dst'] as $key) {
+            if (isset($cmdArgs[$key]) && \is_string($cmdArgs[$key])) {
+                $hashes[] = $cmdArgs[$key];
+            }
+        }
+        foreach (['targets', 'upload_path'] as $key) {
+            if (isset($cmdArgs[$key]) && \is_array($cmdArgs[$key])) {
+                foreach ($cmdArgs[$key] as $hash) {
+                    if (\is_string($hash)) {
+                        $hashes[] = $hash;
+                    }
                 }
             }
         }
 
-        return false;
+        $paths = [];
+        foreach (array_unique($hashes) as $hash) {
+            $volume = $elfinder->getVolume($hash);
+            if (!\is_object($volume) || !method_exists($volume, 'getPath')) {
+                continue;
+            }
+            $path = $volume->getPath($hash);
+            if (\is_string($path) && $path !== '') {
+                $paths[] = $path;
+            }
+        }
+
+        return $paths;
+    }
+
+    public function isCommandAllowedForPaths($cmd, array $paths, PermissionsProvider $permissions)
+    {
+        foreach ($paths as $path) {
+            $enabled = $permissions->getEnabledCommandsForPath($path);
+            if (!\in_array($cmd, $enabled, true) && !\in_array('*', $enabled, true)) {
+                return false;
+            }
+        }
+
+        return true;
     }
 
     private function scanForPattern($content, $fileName)

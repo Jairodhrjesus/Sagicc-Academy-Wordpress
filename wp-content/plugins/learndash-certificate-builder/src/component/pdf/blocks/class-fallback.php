@@ -31,7 +31,7 @@ class Fallback extends Block {
 		 */
 		$output = apply_filters(
 			'learndash_certificate_builder_block_fallback',
-			do_shortcode( trim( $this->block['innerHTML'] ) ),
+			do_shortcode( trim( $this->block['innerHTML'] ?? '' ) ),
 			$this->block
 		);
 

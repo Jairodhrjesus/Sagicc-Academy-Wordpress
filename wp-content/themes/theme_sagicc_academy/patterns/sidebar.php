@@ -131,147 +131,96 @@ if ($is_logged_in) {
 	$current_user = wp_get_current_user();
 	$avatar_url = get_avatar_url($current_user->ID, array('size' => 32));
 	if ($avatar_url) {
-		$user_avatar = '<img src="' . esc_url($avatar_url) . '" class="w-8 h-8 rounded-full object-cover border border-gray-100" />';
+		$user_avatar = '<img src="' . esc_url($avatar_url) . '" class="sa-avatar-sm" />';
 	}
 }
 
 if (empty($user_avatar)) {
 	$icon = $is_logged_in ? 'fa-user-gear' : 'fa-user-lock';
-	$user_avatar = '<span class="w-8 h-8 rounded-full bg-gray-50 flex items-center justify-center text-gray-400 hover:text-secondary group transition-colors"><i class="fa-solid ' . esc_attr($icon) . ' text-xs"></i></span>';
+	$user_avatar = '<span class="sa-avatar-sm-placeholder"><i class="fa-solid ' . esc_attr($icon) . ' text-xs"></i></span>';
 }
 
 $theme_uri = get_stylesheet_directory_uri();
 ?>
 
-<aside id="sidebar"
-	class="hidden lg:flex w-72 border-r border-gray-100 flex-col h-screen sticky top-0 bg-white transition-all duration-300 ease-in-out font-sans">
-	<div class="p-6 flex flex-col h-full overflow-hidden">
+<aside id="sidebar" class="sa-sidebar">
+	<div class="sa-sidebar-wrapper">
 		<!-- LOGO SECTION -->
-		<div class="flex items-center gap-2 mb-8 px-2 min-h-[48px]">
-			<a href="<?php echo esc_url($dashboard_url); ?>" id="sidebar-logo"
-				class="flex items-center gap-2 overflow-hidden transition-all duration-300 hover:opacity-80 active:scale-[0.98]">
-				<img src="<?php echo esc_url($theme_uri . '/assets/Sagicc-Academy-Logo.svg'); ?>" alt="Sagicc Academy"
-					class="h-10 w-auto min-w-[40px] full-logo" />
-				<img src="<?php echo esc_url($theme_uri . '/assets/isotipo-sagicc-academy.svg'); ?>"
-					alt="Sagicc Academy" class="h-10 w-auto min-w-[40px] isotype-logo hidden" />
+		<div class="sa-sidebar-logo-container">
+			<a href="<?php echo esc_url($dashboard_url); ?>" id="sidebar-logo" class="sa-sidebar-logo-link">
+				<img src="<?php echo esc_url($theme_uri . '/assets/Sagicc-Academy-Logo.svg'); ?>" alt="Sagicc Academy" class="sa-sidebar-logo full-logo" />
+				<img src="<?php echo esc_url($theme_uri . '/assets/isotipo-sagicc-academy.svg'); ?>" alt="Sagicc Academy" class="sa-sidebar-logo isotype-logo hidden" />
 			</a>
 		</div>
 
-		<div id="sidebar-content" class="flex-1 overflow-y-auto overflow-x-hidden scrollbar-hide">
+		<div id="sidebar-content" class="sa-sidebar-content scrollbar-hide">
 			<!-- NAVIGATION: MAIN -->
-			<nav class="space-y-1 mb-10">
-				<a href="<?php echo esc_url($dashboard_url); ?>"
-					class="flex items-center gap-3 px-3 py-2.5 bg-gray-50 text-secondary rounded-lg font-bold text-base group"
-					title="<?php echo esc_attr($t('dashboard.title')); ?>">
-					<i class="fa-solid fa-table-columns w-6 text-sm text-center"></i>
-					<span
-						class="sidebar-text transition-opacity duration-300"><?php echo esc_html($t('dashboard.title')); ?></span>
+			<nav class="sa-sidebar-nav">
+				<a href="<?php echo esc_url($dashboard_url); ?>" class="sa-sidebar-link active" title="<?php echo esc_attr($t('dashboard.title')); ?>">
+					<i class="fa-solid fa-table-columns"></i>
+					<span class="sidebar-text"><?php echo esc_html($t('dashboard.title')); ?></span>
 				</a>
-				<a data-search-trigger
-					class="flex items-center gap-3 px-3 py-2.5 text-gray-400 hover:bg-gray-50 hover:text-secondary rounded-lg font-bold text-base transition-all group cursor-pointer"
-					title="<?php echo esc_attr($t('dashboard.search')); ?>">
-					<i class="fa-solid fa-magnifying-glass w-6 text-sm text-center"></i>
-					<span
-						class="sidebar-text transition-opacity duration-300 whitespace-nowrap"><?php echo esc_html($t('dashboard.search')); ?></span>
-					<span
-						class="sidebar-text ml-auto text-xs border border-gray-200 px-2 py-0.5 rounded text-gray-300 font-medium opacity-0 group-hover:opacity-100 lg:block hidden">⌘P</span>
+				<a data-search-trigger class="sa-sidebar-link" title="<?php echo esc_attr($t('dashboard.search')); ?>">
+					<i class="fa-solid fa-magnifying-glass"></i>
+					<span class="sidebar-text"><?php echo esc_html($t('dashboard.search')); ?></span>
+					<span class="sidebar-text sa-sidebar-shortcut">⌘P</span>
 				</a>
 			</nav>
 
 			<!-- NAVIGATION: LEARN -->
-			<div class="mb-10">
-				<p
-					class="sidebar-text px-3 text-sm font-black text-gray-300 uppercase mb-4 whitespace-nowrap overflow-hidden">
+			<div class="sa-sidebar-section">
+				<p class="sidebar-text sa-sidebar-section-title">
 					<?php echo esc_html($t('dashboard.section_learn')); ?>
 				</p>
-				<nav class="space-y-1">
-					<a href="<?php echo esc_url($courses_url); ?>"
-						class="flex items-center gap-3 px-3 py-2 text-gray-500 hover:bg-gray-50 hover:text-secondary rounded-lg font-bold text-base transition-all group"
-						title="<?php echo esc_attr($t('dashboard.courses')); ?>">
-						<i class="fa-solid fa-graduation-cap w-6 text-sm text-center"></i>
-						<span
-							class="sidebar-text transition-opacity duration-300 whitespace-nowrap"><?php echo esc_html($t('dashboard.courses')); ?></span>
+				<nav class="sa-sidebar-nav">
+					<a href="<?php echo esc_url($courses_url); ?>" class="sa-sidebar-link" title="<?php echo esc_attr($t('dashboard.courses')); ?>">
+						<i class="fa-solid fa-graduation-cap"></i>
+						<span class="sidebar-text"><?php echo esc_html($t('dashboard.courses')); ?></span>
 					</a>
-					<a href="<?php echo esc_url($routes_url); ?>"
-						class="flex items-center gap-3 px-3 py-2 text-gray-500 hover:bg-gray-50 hover:text-secondary rounded-lg font-bold text-base transition-all group"
-						title="<?php echo esc_attr($t('dashboard.routes')); ?>">
-						<i class="fa-solid fa-route w-6 text-sm text-center"></i>
-						<span
-							class="sidebar-text transition-opacity duration-300 whitespace-nowrap"><?php echo esc_html($t('dashboard.routes')); ?></span>
+					<a href="<?php echo esc_url($videos_url); ?>" class="sa-sidebar-link" title="<?php echo esc_attr($t('dashboard.videos')); ?>">
+						<i class="fa-solid fa-play"></i>
+						<span class="sidebar-text"><?php echo esc_html($t('dashboard.videos')); ?></span>
 					</a>
-					<a href="<?php echo esc_url($videos_url); ?>"
-						class="flex items-center gap-3 px-3 py-2 text-gray-500 hover:bg-gray-50 hover:text-secondary rounded-lg font-bold text-base transition-all group"
-						title="<?php echo esc_attr($t('dashboard.videos')); ?>">
-						<i class="fa-solid fa-play w-6 text-sm text-center"></i>
-						<span
-							class="sidebar-text transition-opacity duration-300 whitespace-nowrap"><?php echo esc_html($t('dashboard.videos')); ?></span>
+					<a href="<?php echo esc_url($guides_url); ?>" class="sa-sidebar-link" title="<?php echo esc_attr($t('dashboard.guides')); ?>">
+						<i class="fa-solid fa-book-open"></i>
+						<span class="sidebar-text"><?php echo esc_html($t('dashboard.guides')); ?></span>
 					</a>
-					<a href="<?php echo esc_url($guides_url); ?>"
-						class="flex items-center gap-3 px-3 py-2 text-gray-500 hover:bg-gray-50 hover:text-secondary rounded-lg font-bold text-base transition-all group"
-						title="<?php echo esc_attr($t('dashboard.guides')); ?>">
-						<i class="fa-solid fa-book-open w-6 text-sm text-center"></i>
-						<span
-							class="sidebar-text transition-opacity duration-300 whitespace-nowrap"><?php echo esc_html($t('dashboard.guides')); ?></span>
+					<a href="<?php echo esc_url($docs_url); ?>" target="_blank" rel="noopener noreferrer" class="sa-sidebar-link" title="<?php echo esc_attr($t('dashboard.docs')); ?>">
+						<i class="fa-solid fa-file-lines"></i>
+						<span class="sidebar-text"><?php echo esc_html($t('dashboard.docs')); ?></span>
+						<i class="fa-solid fa-up-right-from-square sa-sidebar-icon-ext sidebar-text"></i>
 					</a>
-					<a href="<?php echo esc_url($docs_url); ?>" target="_blank" rel="noopener noreferrer"
-						class="flex items-center gap-3 px-3 py-2 text-gray-500 hover:bg-gray-50 hover:text-secondary rounded-lg font-bold text-base transition-all group"
-						title="<?php echo esc_attr($t('dashboard.docs')); ?>">
-						<i class="fa-solid fa-file-lines w-6 text-sm text-center"></i>
-						<span
-							class="sidebar-text transition-opacity duration-300 whitespace-nowrap"><?php echo esc_html($t('dashboard.docs')); ?></span>
-						<i
-							class="fa-solid fa-up-right-from-square text-[10px] ml-auto opacity-0 group-hover:opacity-40 sidebar-text transition-all"></i>
+					<a href="<?php echo esc_url($interactive_url); ?>" class="sa-sidebar-link" title="<?php echo esc_attr($t('dashboard.interactive')); ?>">
+						<i class="fa-solid fa-computer-mouse"></i>
+						<span class="sidebar-text"><?php echo esc_html($t('dashboard.interactive')); ?></span>
 					</a>
-					<a href="<?php echo esc_url($interactive_url); ?>"
-						class="flex items-center gap-3 px-3 py-2 text-gray-500 hover:bg-gray-50 hover:text-secondary rounded-lg font-bold text-base transition-all group"
-						title="<?php echo esc_attr($t('dashboard.interactive')); ?>">
-						<i class="fa-solid fa-computer-mouse w-6 text-sm text-center"></i>
-						<span
-							class="sidebar-text transition-opacity duration-300 whitespace-nowrap"><?php echo esc_html($t('dashboard.interactive')); ?></span>
-					</a>
-					<a href="<?php echo esc_url($certificates_url); ?>"
-						class="flex items-center gap-3 px-3 py-2 text-gray-500 hover:bg-gray-50 hover:text-secondary rounded-lg font-bold text-base transition-all group"
-						title="<?php echo esc_attr($t('dashboard.certificates')); ?>">
-						<i class="fa-solid fa-award w-6 text-sm text-center"></i>
-						<span
-							class="sidebar-text transition-opacity duration-300 whitespace-nowrap"><?php echo esc_html($t('dashboard.certificates')); ?></span>
+					<a href="<?php echo esc_url($certificates_url); ?>" class="sa-sidebar-link" title="<?php echo esc_attr($t('dashboard.certificates')); ?>">
+						<i class="fa-solid fa-award"></i>
+						<span class="sidebar-text"><?php echo esc_html($t('dashboard.certificates')); ?></span>
 					</a>
 				</nav>
 			</div>
 
 			<!-- NAVIGATION: PARTICIPATE -->
-			<div class="mb-10">
-				<p
-					class="sidebar-text px-3 text-sm font-black text-gray-300 uppercase mb-4 whitespace-nowrap overflow-hidden">
+			<div class="sa-sidebar-section">
+				<p class="sidebar-text sa-sidebar-section-title">
 					<?php echo esc_html($t('dashboard.section_participate')); ?>
 				</p>
-				<nav class="space-y-1">
-					<a href="<?php echo esc_url($support_url); ?>" target="_blank" rel="noopener noreferrer"
-						class="flex items-center gap-3 px-3 py-2 text-gray-500 hover:bg-gray-50 hover:text-secondary rounded-lg font-bold text-base transition-all group"
-						title="<?php echo esc_attr($t('dashboard.support')); ?>">
-						<i class="fa-solid fa-headset w-6 text-sm text-center"></i>
-						<span
-							class="sidebar-text transition-opacity duration-300 whitespace-nowrap"><?php echo esc_html($t('dashboard.support')); ?></span>
-						<i
-							class="fa-solid fa-up-right-from-square text-[10px] ml-auto opacity-0 group-hover:opacity-40 sidebar-text transition-all"></i>
+				<nav class="sa-sidebar-nav">
+					<a href="<?php echo esc_url($support_url); ?>" target="_blank" rel="noopener noreferrer" class="sa-sidebar-link" title="<?php echo esc_attr($t('dashboard.support')); ?>">
+						<i class="fa-solid fa-headset"></i>
+						<span class="sidebar-text"><?php echo esc_html($t('dashboard.support')); ?></span>
+						<i class="fa-solid fa-up-right-from-square sa-sidebar-icon-ext sidebar-text"></i>
 					</a>
-					<a href="<?php echo esc_url($updates_url); ?>" target="_blank" rel="noopener noreferrer"
-						class="flex items-center gap-3 px-3 py-2 text-gray-500 hover:bg-gray-50 hover:text-secondary rounded-lg font-bold text-base transition-all group"
-						title="<?php echo esc_attr($t('dashboard.updates')); ?>">
-						<i class="fa-solid fa-bullhorn w-6 text-sm text-center"></i>
-						<span
-							class="sidebar-text transition-opacity duration-300 whitespace-nowrap"><?php echo esc_html($t('dashboard.updates')); ?></span>
-						<i
-							class="fa-solid fa-up-right-from-square text-[10px] ml-auto opacity-0 group-hover:opacity-40 sidebar-text transition-all"></i>
+					<a href="<?php echo esc_url($updates_url); ?>" target="_blank" rel="noopener noreferrer" class="sa-sidebar-link" title="<?php echo esc_attr($t('dashboard.updates')); ?>">
+						<i class="fa-solid fa-bullhorn"></i>
+						<span class="sidebar-text"><?php echo esc_html($t('dashboard.updates')); ?></span>
+						<i class="fa-solid fa-up-right-from-square sa-sidebar-icon-ext sidebar-text"></i>
 					</a>
-					<a href="<?php echo esc_url($ideas_url); ?>" target="_blank" rel="noopener noreferrer"
-						class="flex items-center gap-3 px-3 py-2 text-gray-500 hover:bg-gray-50 hover:text-secondary rounded-lg font-bold text-base transition-all group"
-						title="<?php echo esc_attr($t('dashboard.feature_ideas')); ?>">
-						<i class="fa-solid fa-lightbulb w-6 text-sm text-center"></i>
-						<span
-							class="sidebar-text transition-opacity duration-300 whitespace-nowrap"><?php echo esc_html($t('dashboard.feature_ideas')); ?></span>
-						<i
-							class="fa-solid fa-up-right-from-square text-[10px] ml-auto opacity-0 group-hover:opacity-40 sidebar-text transition-all"></i>
+					<a href="<?php echo esc_url($ideas_url); ?>" target="_blank" rel="noopener noreferrer" class="sa-sidebar-link" title="<?php echo esc_attr($t('dashboard.feature_ideas')); ?>">
+						<i class="fa-solid fa-lightbulb"></i>
+						<span class="sidebar-text"><?php echo esc_html($t('dashboard.feature_ideas')); ?></span>
+						<i class="fa-solid fa-up-right-from-square sa-sidebar-icon-ext sidebar-text"></i>
 					</a>
 				</nav>
 			</div>
@@ -371,6 +320,25 @@ $theme_uri = get_stylesheet_directory_uri();
 		</div>
 	<?php endif; ?>
 </aside>
+
+<!-- SEARCH MODAL -->
+<div id="search-modal" class="fixed inset-0 z-[999999] hidden items-center justify-center p-4 anim-fade-in font-sans">
+	<div class="absolute inset-0 bg-secondary/40 backdrop-blur-sm" id="search-modal-overlay"></div>
+	<div class="relative bg-white rounded-3xl p-6 max-w-2xl w-full shadow-2xl scale-95 opacity-0 search-modal-content transition-all duration-300">
+		<div class="flex items-center justify-between mb-4 border-b border-gray-100 pb-4">
+			<h3 class="text-xl font-bold text-secondary flex items-center gap-2">
+				<i class="fa-solid fa-magnifying-glass text-sagicc text-base"></i>
+				<?php echo esc_html($lang === 'es' ? 'Buscar en la Academia' : 'Search the Academy'); ?>
+			</h3>
+			<button id="close-search-btn" class="text-gray-400 hover:text-secondary transition-colors p-1">
+				<i class="fa-solid fa-xmark text-lg"></i>
+			</button>
+		</div>
+		<div class="wp-search-box">
+			<?php echo do_shortcode('[wpdreams_ajaxsearchlite]'); ?>
+		</div>
+	</div>
+</div>
 
 <style>
 	/* Ajustes cuando el sidebar está contraído */
@@ -538,9 +506,55 @@ $theme_uri = get_stylesheet_directory_uri();
 			});
 		}
 
+		function setupSearchModal() {
+			const trigger = document.querySelector("[data-search-trigger]");
+			const modal = document.getElementById("search-modal");
+			const overlay = document.getElementById("search-modal-overlay");
+			const closeBtn = document.getElementById("close-search-btn");
+			const content = modal?.querySelector(".search-modal-content");
+
+			if (!modal || !trigger) return;
+
+			const openSearch = () => {
+				modal.classList.remove("hidden");
+				modal.classList.add("flex");
+				setTimeout(() => {
+					content?.classList.remove("scale-95", "opacity-0");
+					const searchInput = modal.querySelector(".orig");
+					if (searchInput) searchInput.focus();
+				}, 50);
+			};
+
+			const closeSearch = () => {
+				content?.classList.add("scale-95", "opacity-0");
+				setTimeout(() => {
+					modal.classList.add("hidden");
+					modal.classList.remove("flex");
+				}, 200);
+			};
+
+			trigger.addEventListener("click", (e) => {
+				e.preventDefault();
+				openSearch();
+			});
+			closeBtn?.addEventListener("click", closeSearch);
+			overlay?.addEventListener("click", closeSearch);
+
+			document.addEventListener("keydown", (e) => {
+				if (e.key === "Escape" && !modal.classList.contains("hidden")) {
+					closeSearch();
+				}
+				if ((e.ctrlKey || e.metaKey) && e.key === "p") {
+					e.preventDefault();
+					openSearch();
+				}
+			});
+		}
+
 		document.addEventListener("DOMContentLoaded", () => {
 			setupSidebar();
 			setupLanguageSwitchers();
+			setupSearchModal();
 			document.addEventListener("click", () => {
 				document.querySelectorAll(".lang-dropdown").forEach((d) => d.classList.add("hidden"));
 			});

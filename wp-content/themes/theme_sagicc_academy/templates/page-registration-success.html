@@ -1,34 +1,33 @@
-<div class="min-h-screen flex bg-white relative font-sans w-full">
+<div class="sa-auth-page">
 	<!-- Columna Izquierda: Cover estético -->
-	<div class="hidden lg:flex lg:w-[45%] relative p-4 bg-gray-50">
-		<div class="relative w-full h-full overflow-hidden rounded-[2.5rem] shadow-2xl bg-gradient-to-tr from-[#080833] via-[#0b0b47] to-[#2463eb] flex flex-col justify-end p-12 text-white">
-			<!-- Overlay sutil con micro-líneas o diseño de fondo -->
-			<div class="absolute inset-0 bg-black/10 mix-blend-multiply"></div>
-			<div class="relative z-10 space-y-4 max-w-md">
-				<h2 class="text-4xl font-extrabold font-title tracking-tight leading-tight">Sagicc Academy</h2>
-				<p class="text-white/80 font-medium text-lg">Domina Sagicc y aprende a crear experiencias únicas.</p>
+	<div class="sa-auth-cover">
+		<div class="sa-auth-cover-card">
+			<div class="sa-auth-cover-overlay"></div>
+			<div class="sa-auth-cover-content">
+				<h2 class="sa-auth-cover-title">Sagicc Academy</h2>
+				<p class="sa-auth-cover-desc">Domina Sagicc y aprende a crear experiencias únicas.</p>
 			</div>
 		</div>
 	</div>
 
 	<!-- Columna Derecha: Contenido de Éxito -->
-	<div class="w-full lg:w-[55%] flex items-center justify-center p-8 sm:p-12 lg:p-24 bg-white">
-		<div class="w-full max-w-sm text-center">
-			<div class="w-20 h-20 bg-green-50 text-green-500 rounded-3xl flex items-center justify-center mb-8 mx-auto">
-				<i class="fa-solid fa-circle-check text-4xl"></i>
+	<div class="sa-auth-form-container">
+		<div class="sa-auth-form-box text-center">
+			<div class="sa-success-icon-box">
+				<i class="fa-solid fa-circle-check"></i>
 			</div>
 			
-			<header class="mb-10">
-				<h1 class="text-3xl font-extrabold text-secondary mb-3 tracking-tight">
+			<header class="sa-auth-header">
+				<h1 class="sa-auth-title" style="font-size: 1.875rem;">
 					¡Registro completado!
 				</h1>
-				<p class="text-gray-400 font-medium leading-relaxed">
+				<p class="sa-auth-subtitle">
 					Tu cuenta ha sido creada exitosamente. Ya puedes acceder a la Academia y comenzar tus cursos.
 				</p>
 			</header>
 
-			<div class="pt-4">
-				<a href="/login" class="block w-full bg-secondary hover:bg-secondary/80 text-white font-extrabold py-4 px-6 rounded-2xl transition-all active:scale-[0.98]">
+			<div style="padding-top: 1rem;">
+				<a href="/login" class="sa-btn sa-btn-secondary w-full">
 					Iniciar Sesión
 				</a>
 			</div>

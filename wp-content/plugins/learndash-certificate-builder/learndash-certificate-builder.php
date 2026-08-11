@@ -3,10 +3,10 @@
  * Plugin Name: LearnDash LMS - Certificate Builder
  * Plugin URI: https://www.learndash.com/ld-add-ons/learndash-certificate-builder/
  * Description: LearnDash certificate builder allows you build certificates for your courses using the Gutenberg WordPress block editor.
- * Version: 1.1.4
+ * Version: 1.1.5
  * Requires PHP: 7.4
  * Requires at least: 6.6
- * Tested up to: 6.9.0
+ * Tested up to: 6.9.1
  * Author: LearnDash
  * Author URI: https://www.learndash.com
  * Text Domain: learndash-certificate-builder
@@ -34,7 +34,7 @@ use LearnDash\Certificate_Builder\Plugin;
 use LearnDash\Core\App;
 use LearnDash_Certificate_Builder\Controller\Certificate_Builder;
 
-define( 'LEARNDASH_CERTIFICATE_BUILDER_VERSION', '1.1.4' );
+define( 'LEARNDASH_CERTIFICATE_BUILDER_VERSION', '1.1.5' );
 define( 'LEARNDASH_CERTIFICATE_BUILDER_DIR', plugin_dir_path( __FILE__ ) );
 define( 'LEARNDASH_CERTIFICATE_BUILDER_URL', plugins_url( '/', __FILE__ ) );
 define( 'LEARNDASH_CERTIFICATE_BUILDER_FILE', __FILE__ );

@@ -1,27 +1,47 @@
-# OS metadata files
+# OS & Environment files
 .DS_Store
 Thumbs.db
 db.db
 *.bak
 *.sql
 *.zip
+*.log
+.env
+.env.*
 
-# WordPress specific
+# WordPress Core Files (standard practice: do not commit WP Core)
+/wp-admin/
+/wp-includes/
+/wp-*.php
+!/wp-content/
+
+# WordPress Content & Generated Files
 wp-config.php
 wp-content/uploads/
 wp-content/upgrade/
+wp-content/upgrade-temp-backup/
 wp-content/backup-db/
+wp-content/ai1wm-backups/
+wp-content/languages/
 wp-content/debug.log
 wp-content/advanced-cache.php
 wp-content/wp-cache-config.php
 wp-content/cache/
+wp-content/blogs.dir/
 
-# WordPress Studio & SQLite integration specific
+# Plugins & Themes (standard practice: track only custom theme)
+wp-content/plugins/
+!wp-content/plugins/index.php
+wp-content/themes/*
+!wp-content/themes/index.php
+!wp-content/themes/theme_sagicc_academy/
+
+# WordPress Studio & Local Dev
 wp-content/database/
 wp-content/database/.ht.sqlite
 .studio/
 
-# IDEs and editors
+# IDEs & Editors
 .idea/
 .vscode/
 *.suo
@@ -30,7 +50,8 @@ wp-content/database/.ht.sqlite
 *.sln
 *.swp
 
-# Node dependencies
+# Node & Build artifacts
 node_modules/
 pnpm-lock.yaml
-
+package-lock.json
+yarn.lock

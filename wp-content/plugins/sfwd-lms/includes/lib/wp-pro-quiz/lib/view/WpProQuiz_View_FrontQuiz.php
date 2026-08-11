@@ -127,25 +127,14 @@ class WpProQuiz_View_FrontQuiz extends WpProQuiz_View_View {
 							! empty( $quiz_resume_data['randomOrder'] ) &&
 							count( $this->question ) > 0
 						) {
-							$question_post_id_pro_id_hash = [];
-							foreach ( $this->question as $question ) {
-								/** @var WpProQuiz_Model_Question $question Question. */
-								$question_post_id_pro_id_hash[ $question->getId() ] = $question->getQuestionPostId();
-
-								// If the Question has since been updated,
-								// ensure we have a reference to the old Pro Quiz ID.
-								if ( $question->getPreviousId() ) {
-									$question_post_id_pro_id_hash[ $question->getPreviousId() ] = $question->getQuestionPostId();
-								}
-							}
-
-							$questions = array();
-							foreach ( $quiz_resume_data['randomOrder'] as $question_id ) {
-								$question = $this->question[ $question_post_id_pro_id_hash[ $question_id ] ];
-
-								$questions[ $question->getQuestionPostId() ] = $question;
-							}
-							$this->question = $questions;
+							/*
+							 * Restore the saved order, skipping any saved question that no longer
+							 * resolves (deleted/updated, or dropped from the rendered subset).
+							 */
+							$this->question = WpProQuiz_Helper_QuestionOrder::order_by_saved_pro_ids(
+								$this->question,
+								$quiz_resume_data['randomOrder']
+							);
 						}
 					}
 				}

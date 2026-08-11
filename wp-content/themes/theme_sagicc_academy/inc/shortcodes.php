@@ -61,33 +61,30 @@ add_shortcode('sagicc_home_header', function () {
 	ob_start();
 
 	if (!$is_logged_in): ?>
-		<header class="mb-16 relative overflow-hidden rounded-3xl bg-secondary p-12 lg:p-16 text-white font-sans">
-			<div class="relative z-10 max-w-2xl">
-				<span
-					class="inline-block px-4 py-1.5 bg-sagicc text-white text-[10px] font-black uppercase tracking-[0.2em] rounded-full mb-6">
+		<header class="sa-hero">
+			<div class="sa-hero-content">
+				<span class="sa-hero-badge">
 					<?php echo esc_html($t('home.welcome_badge')); ?>
 				</span>
-				<h1 class="text-5xl lg:text-7xl font-black text-white leading-[0.95] tracking-tighter mb-6">
+				<h1 class="sa-hero-title">
 					<?php echo esc_html($t('home.hero_title')); ?>
 				</h1>
-				<p class="text-gray-400 text-lg lg:text-xl font-medium mb-10 max-w-lg">
+				<p class="sa-hero-desc">
 					<?php echo esc_html($t('home.hero_desc')); ?>
 				</p>
-				<div class="flex flex-wrap gap-4">
-					<a href="<?php echo esc_url(home_url('/login/')); ?>"
-						class="px-8 py-4 bg-white text-secondary rounded-2xl font-black text-base hover:bg-gray-100 transition-all active:scale-95 shadow-xl shadow-white/10">
+				<div class="sa-hero-actions">
+					<a href="<?php echo esc_url(home_url('/login/')); ?>" class="sa-btn sa-btn-primary">
 						<?php echo esc_html($t('home.cta_start')); ?>
 					</a>
-					<a href="<?php echo esc_url(home_url('/register/')); ?>"
-						class="px-8 py-4 bg-white/10 text-white border border-white/10 rounded-2xl font-black text-base hover:bg-white/20 transition-all active:scale-95">
+					<a href="<?php echo esc_url(home_url('/register/')); ?>" class="sa-btn sa-btn-outline">
 						<?php echo esc_html($t('home.cta_register')); ?>
 					</a>
 				</div>
 			</div>
 
 			<!-- Abstract Background Decoration -->
-			<div class="absolute -right-20 -top-20 w-96 h-96 bg-sagicc/20 rounded-full blur-[120px]"></div>
-			<div class="absolute right-20 bottom-0 w-64 h-64 bg-blue-500/20 rounded-full blur-[100px]"></div>
+			<div class="sa-hero-bg-glow-1"></div>
+			<div class="sa-hero-bg-glow-2"></div>
 		</header>
 	<?php else:
 		$current_user = wp_get_current_user();
@@ -96,11 +93,11 @@ add_shortcode('sagicc_home_header', function () {
 			$first_name = $current_user->display_name;
 		}
 		?>
-		<header class="mb-12 font-sans">
-			<h1 class="text-4xl font-black text-secondary tracking-tighter mb-2">
+		<header class="sa-header">
+			<h1 class="sa-header-title">
 				<?php echo esc_html($t('dashboard.welcome_back')); ?>, <?php echo esc_html($first_name); ?>
 			</h1>
-			<p class="text-gray-400 font-medium text-lg">
+			<p class="sa-header-subtitle">
 				<?php echo esc_html($t('dashboard.available_courses_desc')); ?>
 			</p>
 		</header>
@@ -122,34 +119,34 @@ add_shortcode( 'sagicc_courses_list', function() {
 
 	ob_start();
 	?>
-	<div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 font-sans">
+	<div class="sa-grid">
 		<?php while ( $courses_query->have_posts() ) : $courses_query->the_post(); 
 			$course_id = get_the_ID();
 			$permalink = get_permalink();
 			$thumbnail_url = get_the_post_thumbnail_url( $course_id, 'large' );
 			$has_access = is_user_logged_in() && function_exists( 'sfwd_lms_has_access' ) && sfwd_lms_has_access( $course_id, get_current_user_id() );
 			?>
-			<article class="bg-white rounded-3xl border border-gray-100 shadow-sm overflow-hidden hover:shadow-md hover:-translate-y-1 transition-all duration-300 flex flex-col h-full">
-				<a href="<?php echo esc_url( $permalink ); ?>" class="relative aspect-[16/9] block overflow-hidden bg-gray-100">
+			<article class="sa-card">
+				<a href="<?php echo esc_url( $permalink ); ?>" class="sa-card-media">
 					<?php if ( $thumbnail_url ) : ?>
-						<img src="<?php echo esc_url( $thumbnail_url ); ?>" alt="<?php the_title_attribute(); ?>" class="object-cover w-full h-full hover:scale-105 transition-transform duration-500">
+						<img src="<?php echo esc_url( $thumbnail_url ); ?>" alt="<?php the_title_attribute(); ?>" class="sa-card-img">
 					<?php else : ?>
-						<div class="w-full h-full bg-slate-50 flex items-center justify-center text-slate-300">
-							<i class="fa-solid fa-graduation-cap text-4xl"></i>
+						<div class="sa-card-media-placeholder">
+							<i class="fa-solid fa-graduation-cap"></i>
 						</div>
 					<?php endif; ?>
 				</a>
-				<div class="p-6 flex-1 flex flex-col">
-					<h3 class="text-xl font-bold text-secondary mb-2 hover:text-sagicc transition-colors">
+				<div class="sa-card-body">
+					<h3 class="sa-card-title">
 						<a href="<?php echo esc_url( $permalink ); ?>">
 							<?php the_title(); ?>
 						</a>
 					</h3>
-					<div class="text-gray-400 text-sm font-medium flex-1 mb-6">
+					<div class="sa-card-excerpt">
 						<?php echo wp_trim_words( get_the_excerpt(), 18 ); ?>
 					</div>
-					<div class="mt-auto">
-						<a href="<?php echo esc_url( $permalink ); ?>" class="block w-full px-6 py-3.5 bg-blue-50 text-sagicc font-black text-center text-sm rounded-2xl hover:bg-secondary hover:text-white transition-all active:scale-[0.98]">
+					<div class="sa-card-footer">
+						<a href="<?php echo esc_url( $permalink ); ?>" class="sa-btn-card">
 							<?php echo $has_access ? esc_html__( 'Continuar curso', 'theme-sagicc-academy' ) : esc_html__( 'Ver curso', 'theme-sagicc-academy' ); ?>
 						</a>
 					</div>
@@ -191,33 +188,33 @@ add_shortcode( 'sagicc_videos_list', function() {
 
 	ob_start();
 	?>
-	<div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 font-sans">
+	<div class="sa-grid">
 		<?php while ( $videos_query->have_posts() ) : $videos_query->the_post(); 
 			$video_id = get_the_ID();
 			$permalink = get_permalink();
 			$thumbnail_url = get_the_post_thumbnail_url( $video_id, 'large' );
 			?>
-			<article class="bg-white rounded-3xl border border-gray-100 shadow-sm overflow-hidden hover:shadow-md hover:-translate-y-1 transition-all duration-300 flex flex-col h-full">
-				<a href="<?php echo esc_url( $permalink ); ?>" class="relative aspect-[16/9] block overflow-hidden bg-gray-100">
+			<article class="sa-card">
+				<a href="<?php echo esc_url( $permalink ); ?>" class="sa-card-media">
 					<?php if ( $thumbnail_url ) : ?>
-						<img src="<?php echo esc_url( $thumbnail_url ); ?>" alt="<?php the_title_attribute(); ?>" class="object-cover w-full h-full hover:scale-105 transition-transform duration-500">
+						<img src="<?php echo esc_url( $thumbnail_url ); ?>" alt="<?php the_title_attribute(); ?>" class="sa-card-img">
 					<?php else : ?>
-						<div class="w-full h-full bg-slate-50 flex items-center justify-center text-slate-300">
-							<i class="fa-solid fa-play text-4xl"></i>
+						<div class="sa-card-media-placeholder">
+							<i class="fa-solid fa-play"></i>
 						</div>
 					<?php endif; ?>
 				</a>
-				<div class="p-6 flex-1 flex flex-col">
-					<h3 class="text-xl font-bold text-secondary mb-2 hover:text-sagicc transition-colors">
+				<div class="sa-card-body">
+					<h3 class="sa-card-title">
 						<a href="<?php echo esc_url( $permalink ); ?>">
 							<?php the_title(); ?>
 						</a>
 					</h3>
-					<div class="text-gray-400 text-sm font-medium flex-1 mb-6">
+					<div class="sa-card-excerpt">
 						<?php echo wp_trim_words( get_the_excerpt(), 18 ); ?>
 					</div>
-					<div class="mt-auto">
-						<a href="<?php echo esc_url( $permalink ); ?>" class="block w-full px-6 py-3.5 bg-blue-50 text-sagicc font-black text-center text-sm rounded-2xl hover:bg-secondary hover:text-white transition-all active:scale-[0.98]">
+					<div class="sa-card-footer">
+						<a href="<?php echo esc_url( $permalink ); ?>" class="sa-btn-card">
 							<?php echo esc_html( $t('view_video') ); ?>
 						</a>
 					</div>
@@ -259,33 +256,33 @@ add_shortcode( 'sagicc_guias_list', function() {
 
 	ob_start();
 	?>
-	<div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 font-sans">
+	<div class="sa-grid">
 		<?php while ( $guias_query->have_posts() ) : $guias_query->the_post(); 
 			$guia_id = get_the_ID();
 			$permalink = get_permalink();
 			$thumbnail_url = get_the_post_thumbnail_url( $guia_id, 'large' );
 			?>
-			<article class="bg-white rounded-3xl border border-gray-100 shadow-sm overflow-hidden hover:shadow-md hover:-translate-y-1 transition-all duration-300 flex flex-col h-full">
-				<a href="<?php echo esc_url( $permalink ); ?>" class="relative aspect-[16/9] block overflow-hidden bg-gray-100">
+			<article class="sa-card">
+				<a href="<?php echo esc_url( $permalink ); ?>" class="sa-card-media">
 					<?php if ( $thumbnail_url ) : ?>
-						<img src="<?php echo esc_url( $thumbnail_url ); ?>" alt="<?php the_title_attribute(); ?>" class="object-cover w-full h-full hover:scale-105 transition-transform duration-500">
+						<img src="<?php echo esc_url( $thumbnail_url ); ?>" alt="<?php the_title_attribute(); ?>" class="sa-card-img">
 					<?php else : ?>
-						<div class="w-full h-full bg-slate-50 flex items-center justify-center text-slate-300">
-							<i class="fa-solid fa-book-open text-4xl"></i>
+						<div class="sa-card-media-placeholder">
+							<i class="fa-solid fa-book-open"></i>
 						</div>
 					<?php endif; ?>
 				</a>
-				<div class="p-6 flex-1 flex flex-col">
-					<h3 class="text-xl font-bold text-secondary mb-2 hover:text-sagicc transition-colors">
+				<div class="sa-card-body">
+					<h3 class="sa-card-title">
 						<a href="<?php echo esc_url( $permalink ); ?>">
 							<?php the_title(); ?>
 						</a>
 					</h3>
-					<div class="text-gray-400 text-sm font-medium flex-1 mb-6">
+					<div class="sa-card-excerpt">
 						<?php echo wp_trim_words( get_the_excerpt(), 18 ); ?>
 					</div>
-					<div class="mt-auto">
-						<a href="<?php echo esc_url( $permalink ); ?>" class="block w-full px-6 py-3.5 bg-blue-50 text-sagicc font-black text-center text-sm rounded-2xl hover:bg-secondary hover:text-white transition-all active:scale-[0.98]">
+					<div class="sa-card-footer">
+						<a href="<?php echo esc_url( $permalink ); ?>" class="sa-btn-card">
 							<?php echo esc_html( $t('view_guide') ); ?>
 						</a>
 					</div>
@@ -342,11 +339,11 @@ add_shortcode('sagicc_archive_header', function($atts) {
 
 	ob_start();
 	?>
-	<header class="mb-12 font-sans">
-		<h1 class="text-4xl font-black text-secondary tracking-tighter mb-2">
+	<header class="sa-header">
+		<h1 class="sa-header-title">
 			<?php echo esc_html($title); ?>
 		</h1>
-		<p class="text-gray-400 font-medium text-lg">
+		<p class="sa-header-subtitle">
 			<?php echo esc_html($desc); ?>
 		</p>
 	</header>
@@ -458,27 +455,27 @@ add_shortcode('sagicc_certificates_list', function () {
 
 	ob_start();
 	?>
-	<div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 font-sans">
+	<div class="sa-grid">
 		<?php foreach ($certificates as $cert) : ?>
-			<article class="bg-white rounded-3xl border border-gray-100 shadow-sm overflow-hidden hover:shadow-md hover:-translate-y-1 transition-all duration-300 flex flex-col h-full">
-				<div class="p-6 flex-1 flex flex-col justify-between">
+			<article class="sa-card">
+				<div class="sa-card-body">
 					<div>
-						<div class="flex items-center gap-2 mb-4">
-							<span class="px-3 py-1 bg-blue-50 text-sagicc text-[11px] font-black uppercase tracking-wider rounded-full">
+						<div class="sa-card-header-meta">
+							<span class="sa-badge">
 								<?php echo esc_html($cert['badge']); ?>
 							</span>
 							<?php if (!empty($cert['date'])) : ?>
-								<span class="text-xs text-gray-400 font-medium">
+								<span class="sa-card-date">
 									<?php echo esc_html($t('completed_on') . ' ' . $cert['date']); ?>
 								</span>
 							<?php endif; ?>
 						</div>
-						<h3 class="text-xl font-bold text-secondary mb-6 leading-snug">
+						<h3 class="sa-card-title">
 							<?php echo esc_html($cert['title']); ?>
 						</h3>
 					</div>
-					<div class="mt-auto">
-						<a href="<?php echo esc_url($cert['link']); ?>" target="_blank" rel="noopener noreferrer" class="block w-full px-6 py-3.5 bg-sagicc text-white font-black text-center text-sm rounded-2xl hover:bg-secondary transition-all active:scale-[0.98]">
+					<div class="sa-card-footer">
+						<a href="<?php echo esc_url($cert['link']); ?>" target="_blank" rel="noopener noreferrer" class="sa-btn-card-solid">
 							<?php echo esc_html($t('download')); ?>
 						</a>
 					</div>

@@ -5,10 +5,11 @@ Tags: file manager, wp file manager, wordpress file manager, files, ftp
 Requires at least: 5.0
 Tested up to: 7.0
 Requires PHP: 7.4
-Stable tag: 6.8.9
+Stable tag: 6.9.1
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
+Manage WordPress files and folders from your dashboard with a built-in code editor: upload, edit, delete, move, rename, and archive, no FTP needed.
 
 == Description ==
 
@@ -337,6 +338,20 @@ This plugin sends data to external services for certain features. Below is a sum
 * Privacy: https://pixoeditor.com/privacy-policy/
 
 == Changelog ==
+
+= 6.9.1 =
+- Security: Fixed an arbitrary file read/deletion vulnerability (Subscriber and above) in the file manager connector that could lead to remote code execution. Props to daroo (Wordfence) and Artus KG (WPScan).
+- Security: The connector no longer serves the site-root volume to low-privileged users. Props to JING QIAN (WPScan).
+- Security: Enforced capability checks on REST API endpoints; the activity log is no longer readable unauthenticated. Props to Farid Narimanov (WPScan).
+- Security: File download now always requires the download permission; trash and upload folders hardened against executable files.
+- Fix: Restore file preview for users with view access but not the download permission.
+- Fix: Activity log now installs correctly on new sites.
+
+= 6.9 =
+- New: Per-user permissions are now enforced per target path across all volumes, with clearer file-manager-only scope hints
+- Fix: WordPress admin submenu now stays highlighted on the active page (Home, Logs, Settings, Permissions, etc.)
+- Fix: File manager no longer overwrites the browser URL, so in-app navigation stays intact
+- Fix: Popup dialogs now layer above the WordPress admin menu and toolbar
 
 = 6.8.9 =
 - Fix: Minimized editor windows now appear as a floating dock at the bottom of the screen

@@ -260,10 +260,19 @@ class Pdf_Content {
 			$attrs
 		);
 		$this->id = absint( $attrs['id'] );
-		// image should be local.
-		$this->background_image = wp_get_attachment_image_url( $this->id, 'full' );
-		if ( false === $this->background_image ) {
-			// false back to URL.
+
+		// Use local file path for mPDF - URLs often fail when server can't access itself.
+		$this->background_image = get_attached_file( $this->id );
+		if (
+			empty( $this->background_image )
+			|| ! file_exists( $this->background_image )
+		) {
+			// Fall back to URL if file path isn't available.
+			$this->background_image = wp_get_attachment_image_url( $this->id, 'full' );
+		}
+
+		// Final fallback to stored URL attribute.
+		if ( empty( $this->background_image ) ) {
 			$this->background_image = $attrs['backgroundImage'];
 			if ( empty( $this->background_image ) ) {
 				wp_die( esc_html__( 'A background image is required.', 'learndash-certificate-builder' ) );

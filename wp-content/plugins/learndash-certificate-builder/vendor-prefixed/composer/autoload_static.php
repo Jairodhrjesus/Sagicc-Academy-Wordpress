@@ -4,7 +4,7 @@
 
 namespace LearnDash\Certificate_Builder\Composer\Autoload;
 
-class ComposerStaticInit82f851e90ea9b729ec72e8d3385bc8c4
+class ComposerStaticInit3d6b86778eabedd22582505627ea5f97
 {
     public static $files = array (
         '66aa6d00cd3bc97f26f570685acf7d51' => __DIR__ . '/..' . '/myclabs/deep-copy/src/DeepCopy/deep_copy.php',
@@ -393,9 +393,9 @@ class ComposerStaticInit82f851e90ea9b729ec72e8d3385bc8c4
     public static function getInitializer(ClassLoader $loader)
     {
         return \Closure::bind(function () use ($loader) {
-            $loader->prefixLengthsPsr4 = ComposerStaticInit82f851e90ea9b729ec72e8d3385bc8c4::$prefixLengthsPsr4;
-            $loader->prefixDirsPsr4 = ComposerStaticInit82f851e90ea9b729ec72e8d3385bc8c4::$prefixDirsPsr4;
-            $loader->classMap = ComposerStaticInit82f851e90ea9b729ec72e8d3385bc8c4::$classMap;
+            $loader->prefixLengthsPsr4 = ComposerStaticInit3d6b86778eabedd22582505627ea5f97::$prefixLengthsPsr4;
+            $loader->prefixDirsPsr4 = ComposerStaticInit3d6b86778eabedd22582505627ea5f97::$prefixDirsPsr4;
+            $loader->classMap = ComposerStaticInit3d6b86778eabedd22582505627ea5f97::$classMap;
 
         }, null, ClassLoader::class);
     }

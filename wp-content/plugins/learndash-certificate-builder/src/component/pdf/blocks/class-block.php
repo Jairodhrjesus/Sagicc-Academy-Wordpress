@@ -80,11 +80,11 @@ abstract class Block {
 	 * Append the id into innerHtml
 	 */
 	protected function fix_id() {
-		$client = new HtmlDocument();
 		if ( empty( $this->block['innerHTML'] ) ) {
 			return;
 		}
-		$client->load( $this->block['innerHTML'] );
+
+		$client  = new HtmlDocument( $this->block['innerHTML'] );
 		$element = $client->lastChild();
 		if ( is_object( $element ) ) {
 			$client->lastChild()->setAttribute( 'id', $this->block['id'] );

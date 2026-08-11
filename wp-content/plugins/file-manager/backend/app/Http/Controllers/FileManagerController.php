@@ -29,7 +29,19 @@ final class FileManagerController
     public function connector()
     {
         try {
-            Plugin::instance()->accessControl()->checkPermission(sanitize_key($_REQUEST['cmd']));
+            $command = isset($_REQUEST['cmd']) && \is_scalar($_REQUEST['cmd'])
+                ? sanitize_key((string) $_REQUEST['cmd'])
+                : '';
+
+            $accessControl = Plugin::instance()->accessControl();
+            if ($accessControl->isConnectorEnforceable($command)) {
+                $permissionResult = $accessControl->checkPermission($command);
+                if (\is_array($permissionResult) && !empty($permissionResult['preventexec'])) {
+                    echo wp_json_encode($permissionResult['results']);
+                    wp_die();
+                }
+            }
+
             $finderProvider = new FileManagerProvider($this->getFinderOptions());
             $finderProvider->getFinder()->run();
         } catch (Exception $th) {
@@ -52,12 +64,13 @@ final class FileManagerController
             ]
         );
 
+        // Bind the gate to the `*.pre` wildcard, not an explicit command list: elFinder
+        // registers a `<cmd>.pre` handler only when the command arrives via $_POST, yet it
+        // dispatches from the merged $_GET+$_POST (plus a php://input re-parse past
+        // max_input_vars). A command sent only via query string / oversized body would skip
+        // registration but still execute, bypassing the gate. `*.pre` registers unconditionally.
         $finderOptions->setBind(
-            'get.pre file.pre archive.pre back.pre chmod.pre colwidth.pre copy.pre cut.pre duplicate.pre editor.pre
-             extract.pre forward.pre fullscreen.pre getfile.pre help.pre home.pre info.pre mkdir.pre mkfile.pre
-             netmount.pre netunmount.pre open.pre opendir.pre paste.pre places.pre quicklook.pre reload.pre
-             rename.pre resize.pre restore.pre rm.pre search.pre sort.pre up.pre upload.pre view.pre zipdl.pre
-             tree.pre parents.pre ls.pre tmb.pre size.pre dim.pre',
+            '*.pre',
             [
                 Plugin::instance()->accessControl(),
                 'checkPermission',
@@ -68,8 +81,6 @@ final class FileManagerController
             'upload',
             [Plugin::instance()->mediaSyncs(), 'onFileUpload']
         );
-
-        // 'zipdl.pre file.pre rename.pre put.pre upload.pre',
 
         $finderOptions->setBind(
             'zipdl.pre file.pre rename.pre put.pre rm.pre chmod.pre mkdir.pre mkfile.pre extract.pre',
@@ -83,10 +94,6 @@ final class FileManagerController
 
         if (fileSystemAdapter()->is_writable(Config::uploadBaseDir() . '/.tmp/')) {
             $finderOptions->setCommonTempPath(Config::uploadBaseDir() . '/.tmp/');
-        }
-
-        if (fileSystemAdapter()->is_writable(Config::uploadBaseDir() . '/.tmb/')) {
-            $finderOptions->setThumbPath(Config::uploadBaseDir() . '/.tmb/');
         }
 
         $allVolumes         = $this->getFileRoots();
@@ -122,15 +129,32 @@ final class FileManagerController
             throw new PreCommandException(esc_html__('There is no readable volume. Please select an readable folder from settings', 'file-manager'));
         }
 
+        $accessControlProvider = Plugin::instance()->accessControl();
+
         foreach ($trashVolumes as $trashSeq => $trashDir) {
             if (!is_dir($trashDir)) {
                 wp_mkdir_p($trashDir);
+                if (\function_exists('bitapps_fm_harden_dir')) {
+                    bitapps_fm_harden_dir($trashDir);
+                }
             }
 
             if (is_dir($trashDir)) {
                 $trashRoot = new FileRoot($trashDir, '', 'Trash', 'Trash');
                 // Explicitly set id so the volume hash is predictable: t{trashSeq}_Lw
                 $trashRoot->setOption('id', $trashSeq + 1);
+                // Trash lives under wp-content/uploads (web-served). Block the commands that
+                // author new file *content* so a write-granted user cannot plant a .php here
+                // (RCE), while keeping `paste`/`rm`/`mkdir`/`rename`: elFinder implements
+                // move-to-trash and restore as a cross-volume `paste`, which calls the trash
+                // volume's `mkdir` (for folders) and `rename` (name-collision resolution) — so
+                // disabling those would break trashing folders. `mkdir`/`rename` write no file
+                // content; the residual rename-to-.php is covered by the dir .htaccess (E-1).
+                // Do NOT add an upload MIME deny-list — it would block trashing an existing
+                // .php/.js/.css file.
+                $trashRoot->setAccessControl([$accessControlProvider, 'control']);
+                $trashRoot->setAcceptedName([$accessControlProvider, 'validateName']);
+                $trashRoot->setDisabled(['upload', 'put', 'mkfile', 'duplicate', 'archive', 'extract']);
                 $finderOptions->setRoot($trashRoot);
             }
         }
@@ -221,10 +245,6 @@ final class FileManagerController
             $this->setAllowedFileType($baseRoot);
         }
 
-        if (fileSystemAdapter()->is_writable(stripslashes($preferences->getRootPath()) . DIRECTORY_SEPARATOR . '.tmbPath')) {
-            $baseRoot->setOption('tmbPath', Config::uploadBaseDir() . '/.tmb/');
-        }
-
         $baseRoot->setAccessControl([$accessControlProvider, 'control']);
         $baseRoot->setAcceptedName([$accessControlProvider, 'validateName']);
         $baseRoot->setDisabled([]);
@@ -243,26 +263,32 @@ final class FileManagerController
 
     private function getUserVolumes()
     {
-        $permissions           = Plugin::instance()->permissions();
+        $permissions = Plugin::instance()->permissions();
+
+        $role             = $permissions->currentUserRole();
+        $permissionByRole = $permissions->getByRole($role);
+        $permissionByUser = $permissions->getByUser($permissions->currentUserID());
+        $publicPath       = $permissions->getPathByFolderOption();
 
         $roots[] = $this->processFileRoot(
-            $permissions->getPathByFolderOption(),
+            $publicPath,
             'Public',
-            $this->getUrlByPath($permissions->getPathByFolderOption())
+            $this->getUrlByPath($publicPath),
+            $permissions->getPublicVolumeDisabledCommands()
         );
 
-        $permissionByRole   = $permissions->getByRole($permissions->currentUserRole());
-        $roots[]            = $this->processFileRoot(
+        $roots[] = $this->processFileRoot(
             $permissionByRole['path'],
-            $permissions->currentUserRole(),
-            $this->getUrlByPath($permissionByRole['path'])
+            $role,
+            $this->getUrlByPath($permissionByRole['path']),
+            $permissions->getRoleVolumeDisabledCommands()
         );
 
-        $permissionByUser   = $permissions->getByUser($permissions->currentUserID());
-        $roots[]            = $this->processFileRoot(
+        $roots[] = $this->processFileRoot(
             $permissionByUser['path'],
             $permissions->currentUser()->display_name,
-            $this->getUrlByPath($permissionByUser['path'])
+            $this->getUrlByPath($permissionByUser['path']),
+            $permissions->getUserVolumeDisabledCommands()
         );
 
         return $roots;
@@ -289,13 +315,14 @@ final class FileManagerController
     /**
      * Create Instance of FileRoot
      *
-     * @param string $path
-     * @param string $alias
-     * @param string $url
+     * @param string     $path
+     * @param string     $alias
+     * @param string     $url
+     * @param array|null $disabledCommands Per-volume disabled-command hint; falls back to global when null.
      *
      * @return FileRoot
      */
-    private function processFileRoot($path, $alias, $url)
+    private function processFileRoot($path, $alias, $url, ?array $disabledCommands = null)
     {
         $permissions           = Plugin::instance()->permissions();
         $accessControlProvider = Plugin::instance()->accessControl();
@@ -308,7 +335,7 @@ final class FileManagerController
         $this->setAllowedFileType($volume);
         $volume->setAccessControl([$accessControlProvider, 'control']);
         $volume->setAcceptedName([$accessControlProvider, 'validateName']);
-        $volume->setDisabled($permissions->getDisabledCommand());
+        $volume->setDisabled($disabledCommands ?? $permissions->getDisabledCommand());
         $volume->setWinHashFix(DIRECTORY_SEPARATOR !== '/');
 
         if (Capabilities::filter(Config::VAR_PREFIX . 'user_can_manage_options')) {

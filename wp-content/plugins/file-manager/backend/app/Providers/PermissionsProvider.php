@@ -16,6 +16,23 @@ use WP_User;
 \defined('ABSPATH') || exit();
 class PermissionsProvider
 {
+    private const ALL_COMMANDS = [
+        'download', // file, zipdl
+        'cut',// only for frontend. send cmd as paste
+        'copy',// only for frontend. send cmd as paste
+        'edit', // put
+        'rm', // rm
+        'upload',// upload
+        'duplicate', // duplicate
+        'paste', // paste
+        'mkfile',// mkfile
+        'mkdir',// mkdir
+        'rename', // rename
+        'archive', // archive
+        'extract',// extract
+        'emailto', // client-only: open mailto link for selected file
+    ];
+
     public $permissions;
 
     public $users;
@@ -101,22 +118,38 @@ class PermissionsProvider
 
     public function allCommands()
     {
-        return [
-            'download', // file, zipdl
-            'cut',// only for frontend. send cmd as paste
-            'copy',// only for frontend. send cmd as paste
-            'edit', // put
-            'rm', // rm
-            'upload',// upload
-            'duplicate', // duplicate
-            'paste', // paste
-            'mkfile',// mkfile
-            'mkdir',// mkdir
-            'rename', // rename
-            'archive', // archive
-            'extract',// extract
-            'emailto', // client-only: open mailto link for selected file
+        return self::ALL_COMMANDS;
+    }
+
+    /**
+     * Human-readable action phrase for a command, for user-facing errors.
+     * Kept here so command names and their labels share one owner; labels can't
+     * live on the ALL_COMMANDS const because __() can't run in a const context.
+     *
+     * @param string $cmd normalized elFinder command
+     *
+     * @return string empty when the command has no friendly label
+     */
+    public function commandLabel($cmd)
+    {
+        $labels = [
+            'download'  => __('download files', 'file-manager'),
+            'cut'       => __('move items', 'file-manager'),
+            'copy'      => __('copy items', 'file-manager'),
+            'edit'      => __('edit files', 'file-manager'),
+            'rm'        => __('delete items', 'file-manager'),
+            'upload'    => __('upload files', 'file-manager'),
+            'duplicate' => __('duplicate items', 'file-manager'),
+            'paste'     => __('paste items', 'file-manager'),
+            'mkfile'    => __('create files', 'file-manager'),
+            'mkdir'     => __('create folders', 'file-manager'),
+            'rename'    => __('rename items', 'file-manager'),
+            'archive'   => __('create archives', 'file-manager'),
+            'extract'   => __('extract archives', 'file-manager'),
+            'emailto'   => __('email files', 'file-manager'),
         ];
+
+        return $labels[$cmd] ?? '';
     }
 
     public function defaultPermissions()
@@ -207,6 +240,9 @@ class PermissionsProvider
             && fileSystemAdapter()->is_writable($defaultPath)
         ) {
             wp_mkdir_p($rootPath);
+            if (\function_exists('bitapps_fm_harden_dir')) {
+                bitapps_fm_harden_dir($rootPath);
+            }
         }
 
         if (!fileSystemAdapter()->exists($rootPath) || !fileSystemAdapter()->is_dir($rootPath) || !fileSystemAdapter()->is_readable($rootPath)) {
@@ -302,6 +338,36 @@ class PermissionsProvider
         }
 
         return $settings;
+    }
+
+    public static function isSubPath(string $path, string $boundary): bool
+    {
+        $path     = rtrim(str_replace('\\', '/', $path), '/');
+        $boundary = rtrim(str_replace('\\', '/', $boundary), '/');
+
+        if ($boundary === '') { // empty or separator-only boundary matches nothing
+            return false;
+        }
+
+        return $path === $boundary || strpos($path, $boundary . '/') === 0;
+    }
+
+    /**
+     * Canonicalize $path and return it only when it resolves inside $boundary.
+     *
+     * @return string|null resolved target path, or null when either side fails to
+     *                     resolve or the target escapes the boundary
+     */
+    public static function realpathWithin(string $path, string $boundary): ?string
+    {
+        $boundaryReal = realpath($boundary);
+        $target       = realpath($path);
+
+        if ($boundaryReal === false || $target === false || !self::isSubPath($target, $boundaryReal)) {
+            return null;
+        }
+
+        return $target;
     }
 
     public function getGuestPermissions()
@@ -477,20 +543,113 @@ class PermissionsProvider
             return [];
         }
 
-        $enabledCommands = $this->getEnabledCommand();
+        return $this->getDisabledCommandFor($this->getEnabledCommand());
+    }
 
-        $disabledCommand = [];
+    public function isPathUnderUserPermission(string $absPath): bool
+    {
+        if (!is_user_logged_in() || !$this->isCurrentUserHasPermission()) {
+            return false;
+        }
+
+        $userPath = $this->permissionsForCurrentUser()['path'] ?? null;
+        if (!\is_string($userPath) || $userPath === '') {
+            return false;
+        }
+
+        $boundary = realpath($userPath);
+        if ($boundary === false) {
+            return false;
+        }
+
+        $target = realpath($absPath);
+        if ($target === false) {
+            // Target does not exist yet (e.g. a create destination). Canonicalize via the
+            // parent so a raw '..' cannot string-match the boundary; reject if the parent
+            // itself does not resolve.
+            $parent = realpath(\dirname($absPath));
+            if ($parent === false) {
+                return false;
+            }
+            $target = $parent . DIRECTORY_SEPARATOR . basename($absPath);
+        }
+
+        return self::isSubPath($target, $boundary);
+    }
+
+    public function getEnabledCommandsForPath(string $absPath): array
+    {
+        if (!is_user_logged_in()) {
+            return $this->getGuestPermissions()['commands'];
+        }
+
+        if ($this->isPathUnderUserPermission($absPath)) {
+            return $this->permissionsForCurrentUser()['commands'];
+        }
+
+        return $this->permissionsForCurrentRole()['commands'];
+    }
+
+    public function getEnabledCommandsUnion(): array
+    {
+        return array_values(array_unique(array_merge(
+            $this->permissionsForCurrentUser()['commands'],
+            $this->permissionsForCurrentRole()['commands']
+        )));
+    }
+
+    public function getDisabledCommandFor(array $enabledCommands): array
+    {
+        $disabled = [];
         foreach ($this->allCommands() as $command) {
-            if (!\in_array($command, $enabledCommands)) {
-                $disabledCommand[] = $command;
+            if (!\in_array($command, $enabledCommands, true)) {
+                $disabled[] = $command;
             }
         }
 
-        return $disabledCommand;
+        return $disabled;
+    }
+
+    /**
+     * Disabled-command hint for the Public volume. Least-restrictive (user ∪ role) so a
+     * nested per-user folder never hides legitimate commands; the runtime gate enforces
+     * the real per-path policy.
+     */
+    public function getPublicVolumeDisabledCommands(): array
+    {
+        return $this->getDisabledCommandFor($this->getEnabledCommandsUnion());
+    }
+
+    public function getRoleVolumeDisabledCommands(): array
+    {
+        return $this->getDisabledCommandFor($this->permissionsForCurrentRole()['commands']);
+    }
+
+    public function getUserVolumeDisabledCommands(): array
+    {
+        $commands = $this->isCurrentUserHasPermission()
+            ? $this->permissionsForCurrentUser()['commands']
+            : $this->permissionsForCurrentRole()['commands'];
+
+        return $this->getDisabledCommandFor($commands);
     }
 
     public function updatePermissionSetting($permissions)
     {
+        // Validated by_user/by_role entries carry only the outer key allow-list; reduce each
+        // entry to the two fields actually consumed (path, commands) so no arbitrary sub-key
+        // is persisted into the option blob.
+        foreach (['by_user', 'by_role'] as $scope) {
+            if (!empty($permissions[$scope]) && \is_array($permissions[$scope])) {
+                foreach ($permissions[$scope] as $key => $entry) {
+                    $permissions[$scope][$key] = [
+                        'path'     => \is_array($entry) && isset($entry['path']) ? $entry['path'] : '',
+                        'commands' => \is_array($entry) && isset($entry['commands']) && \is_array($entry['commands']) ? $entry['commands'] : [],
+                    ];
+                }
+            }
+        }
+
         return Config::updateOption('permissions', $permissions, 'yes');
     }
 
@@ -502,7 +661,12 @@ class PermissionsProvider
             $action = sanitize_key($_REQUEST['action']);
         }
 
-        return is_user_logged_in() && $action === 'bitapps_fm_connector';
+        // The dashboard volume is rooted at the site root, so it must require the same
+        // capability as the admin File Manager screen. A valid wp_rest nonce is held by
+        // every logged-in user and is not authorization, so gate on the capability too.
+        return is_user_logged_in()
+            && $action === 'bitapps_fm_connector'
+            && Capabilities::filter('bitapps_fm_can_access_home', 'manage_options');
     }
 
     public function isRequestForShortcode()

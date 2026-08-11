@@ -20,9 +20,8 @@ class Core_Heading extends Block {
 	 * Trigger
 	 */
 	public function run() {
-		$client = new HtmlDocument();
-		$html   = do_shortcode( $this->block['innerHTML'] );
-		$client->load( $html );
+		$html       = do_shortcode( $this->block['innerHTML'] ?? '' );
+		$client     = new HtmlDocument( $html );
 		$last_child = $client->lastChild();
 		$html       = str_replace( $last_child->innertext, str_replace( ' ', '&nbsp;', $last_child->innertext ), $html );
 

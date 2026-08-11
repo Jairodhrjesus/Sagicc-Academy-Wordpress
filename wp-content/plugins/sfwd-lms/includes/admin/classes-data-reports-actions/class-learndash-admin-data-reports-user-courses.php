@@ -156,105 +156,232 @@ class Learndash_Admin_Data_Reports_Courses extends Learndash_Admin_Settings_Data
 	}
 
 	/**
-	 * Class method for the AJAX update logic
-	 * This function will determine what users need to be converted. Then the course and quiz functions
-	 * will be called to convert each individual user data set.
+	 * Handles the AJAX export request.
+	 *
+	 * Prepares the export state and queues the first background chunk via Action Scheduler,
+	 * returning a queued-state snapshot. Subsequent rounds are no
+	 * longer driven by the browser — Action Scheduler chains chunks server-side via
+	 * `process_export_chunk()`, and progress (plus the final download link) surfaces
+	 * through admin notices.
 	 *
 	 * @since 2.3.0
 	 * @since 4.25.6 The internal processing logic has been updated to be in sync with the Reporting Block results.
+	 * @since 5.1.6 Iteration moved to Action Scheduler; this method only queues the export now.
 	 *
 	 * @param array<string,mixed> $data Post data from AJAX call.
-	 * @phpstan-param array{nonce?: string, init?: int, filters?: array<string, mixed>, group_id?: int, time_start?: string, time_end?: string, course_ids?: array<int>, posts_ids?: array<int>, users_ids?: array<int>, slug?: string, error_message?: string} $data
+	 * @phpstan-param array{nonce?: string, init?: int, filters?: array<string, mixed>, group_id?: int, time_start?: string, time_end?: string, course_ids?: array<int>, posts_ids?: array<int>, users_ids?: array<int>, slug?: string} $data
 	 *
-	 * @return array<string, mixed> Post data from AJAX call.
+	 * @return array<string, mixed> Response payload describing the queued export.
 	 */
 	public function process_report_action( $data = [] ) {
-		global $wpdb;
-
-		// Initialize default values for progress tracking.
-		$result = [];
-
-		// Load the CSV parsing library for report generation.
 		require_once LEARNDASH_LMS_LIBRARY_DIR . '/parsecsv.lib.php';
 
-		// Verify nonce for security and process the request.
 		if ( empty( $data['nonce'] ) ) {
-			return $result;
+			return [];
 		}
 
 		$nonce = $data['nonce'];
+
 		if ( ! wp_verify_nonce( $nonce, 'learndash-data-reports-' . $this->data_slug . '-' . get_current_user_id() ) ) {
-			return $result;
+			return [];
 		}
 
-		// Generate unique transient key for this report session.
 		$this->transient_key = $this->data_slug . '_' . $nonce;
+		$this->csv_parse     = new lmsParseCSV();
 
-		// Initialize CSV parser instance.
+		// Do not start a second export while one is already queued or running — the running
+		// export's progress notice already covers it.
+		$engine = Learndash_Admin_Background_Export::get_instance();
+
+		if (
+			$engine instanceof Learndash_Admin_Background_Export
+			&& $engine->is_export_in_progress()
+		) {
+			return [
+				'status' => 'running',
+				'slug'   => $this->data_slug,
+			];
+		}
+
+		$this->initialize_report_data( $data );
+
+		$has_chunkable_users =
+			isset( $this->transient_data['users_ids'] )
+			&& is_array( $this->transient_data['users_ids'] )
+			&& ! empty( $this->transient_data['users_ids'] );
+
+		if ( $has_chunkable_users ) {
+			$this->transient_data['users_ids'] = array_values( $this->transient_data['users_ids'] );
+		}
+
+		$total_count = $has_chunkable_users
+			? count( $this->transient_data['users_ids'] )
+			: 1;
+
+		$this->transient_data['total_count'] = $total_count;
+		$this->transient_data['offset']      = 0;
+
+		$this->set_option_cache( $this->transient_key, $this->transient_data );
+
+		if ( $engine instanceof Learndash_Admin_Background_Export ) {
+			$engine->enqueue_export_chunk_task( $this->transient_key, $this->data_slug );
+		}
+
+		return [
+			'status'        => 'queued',
+			'slug'          => $this->data_slug,
+			'transient_key' => $this->transient_key,
+		];
+	}
+
+	/**
+	 * Processes one chunk of users for the in-progress course export.
+	 *
+	 * Invoked by the Action Scheduler dispatcher in
+	 * `Learndash_Admin_Background_Export::handle_export_chunk_task()`.
+	 *
+	 * When `users_ids` is populated in the transient (Reports admin extract, group
+	 * context, or any caller passing an explicit user list), this method slices a
+	 * fixed-size chunk off the head of the remaining list, runs the activity query
+	 * restricted to that slice, appends the rows to the CSV, drops the slice, and
+	 * returns true while more users remain. This keeps the `WHERE user_id IN (...)`
+	 * clause small enough to stay under `max_allowed_packet` on sites with very large
+	 * user bases.
+	 *
+	 * When `users_ids` is empty (legacy Reports → Settings export with no caller-supplied
+	 * user list), the method falls back to a single batched query and returns false so
+	 * the dispatcher marks the export done.
+	 *
+	 * @since 5.1.6
+	 *
+	 * @param string $transient_key Transient key holding the export state.
+	 *
+	 * @return bool True when more users remain to process; false when the export is done.
+	 */
+	public function process_export_chunk( string $transient_key ): bool {
+		if ( empty( $transient_key ) ) {
+			return false;
+		}
+
+		$this->transient_key  = $transient_key;
+		$this->transient_data = $this->get_transient( $transient_key );
+
+		if (
+			! is_array( $this->transient_data )
+			|| empty( $this->transient_data['report_filename'] )
+		) {
+			return false;
+		}
+
+		if ( empty( $this->data_headers ) ) {
+			$this->set_report_headers();
+		}
+
+		$this->report_filename = $this->transient_data['report_filename'];
+
+		require_once LEARNDASH_LMS_LIBRARY_DIR . '/parsecsv.lib.php';
+
 		$this->csv_parse = new lmsParseCSV();
 
-		// Handle initialization phase - first AJAX call sets up the report.
-		if (
-			isset( $data['init'] )
-			&& 1 === intval( (string) $data['init'] )
-		) {
-			$result = array_merge(
-				$data,
-				$this->initialize_report_data( $data )
-			);
+		$has_chunkable_users =
+			isset( $this->transient_data['users_ids'] )
+			&& is_array( $this->transient_data['users_ids'] )
+			&& ! empty( $this->transient_data['users_ids'] );
 
-			// Remove init flag from result.
-			unset( $result['init'] );
-		} else {
-			// Subsequent calls: retrieve cached data from previous initialization.
-			$this->transient_data  = $this->get_transient( $this->transient_key );
-			$this->report_filename = $this->transient_data['report_filename'];
-
-			$result = array_merge(
-				$data,
-				$this->fetch_and_save_activity_data()
-			);
+		if ( ! $has_chunkable_users ) {
+			// Legacy single-chunk path: no caller supplied a user list, fall back to one
+			// batched query against the activity table (no IN clause).
+			$this->fetch_and_save_activity_data();
+			return false;
 		}
 
-		// Calculate progress percentage for UI display.
-		$result['progress_percent'] = $result['total_count'] > 0
-			? ( $result['result_count'] / $result['total_count'] ) * 100
-			: 100;
+		/**
+		 * Number of users processed per chunk during the background CSV export.
+		 *
+		 * Lowering this value keeps the `WHERE user_id IN (...)` clause smaller on
+		 * sites with very large user bases (the original 200k-user bug), at the
+		 * cost of more Action Scheduler ticks to drain the full set. Raising it
+		 * speeds completion on healthy hosts.
+		 *
+		 * @since 5.1.6
+		 *
+		 * @param int $chunk_size Number of users processed per export chunk. Default 100.
+		 *
+		 * @return int Number of users processed per export chunk.
+		 */
+		$chunk_size = Cast::to_int( apply_filters( 'learndash_report_user_activity_export_chunk_size', 100 ) );
 
-		// Generate human-readable progress label.
-		$result_count             = $result['result_count'];
-		$total_count              = $result['total_count'];
-		$result['progress_label'] = sprintf(
-			// translators: placeholders: result count, total count.
-			esc_html_x( '%1$d of %2$s results', 'placeholders: result count, total count', 'learndash' ),
-			is_numeric( $result_count ) ? (int) $result_count : 0,
-			is_numeric( $total_count ) ? (string) $total_count : '0'
-		);
+		if ( $chunk_size < 1 ) {
+			$chunk_size = 100;
+		}
 
-		return $result;
+		$offset      = isset( $this->transient_data['offset'] ) ? (int) $this->transient_data['offset'] : 0;
+		$total_users = count( $this->transient_data['users_ids'] );
+
+		if ( $offset >= $total_users ) {
+			return false;
+		}
+
+		// Advance an integer offset through the immutable users list. Persisting only the
+		// offset keeps each chunk's transient write to a handful of bytes instead of
+		// rewriting the full (potentially hundreds-of-thousands-long) ID array every chunk.
+		$chunk = array_slice( $this->transient_data['users_ids'], $offset, $chunk_size );
+
+		$this->fetch_and_save_activity_data( $chunk );
+
+		$this->transient_data['offset'] = $offset + count( $chunk );
+
+		$this->set_option_cache( $this->transient_key, $this->transient_data );
+
+		return $this->transient_data['offset'] < $total_users;
 	}
 
 	/**
 	 * Initialize report data and set up the report file.
 	 *
 	 * @since 4.25.6
+	 * @since 5.1.6 No longer returns a progress payload; it only seeds the export transient and CSV file.
 	 *
 	 * @param array<string,mixed> $data The input data array.
-	 * @phpstan-param array{nonce?: string, init?: int, filters?: array<string, mixed>, group_id?: int, time_start?: string, time_end?: string, course_ids?: array<int>, posts_ids?: array<int>, users_ids?: array<int>, slug?: string, error_message?: string} $data
+	 * @phpstan-param array{nonce?: string, init?: int, filters?: array<string, mixed>, group_id?: int, time_start?: string, time_end?: string, course_ids?: array<int>, posts_ids?: array<int>, users_ids?: array<int>, slug?: string} $data
 	 *
-	 * @return array<string, mixed> The data array with initialization results.
+	 * @return void
 	 */
-	private function initialize_report_data( array $data ): array {
+	private function initialize_report_data( array $data ): void {
 		// Initialize transient data storage.
 		$this->transient_data = [
 			'nonce' => $data['nonce'] ?? '',
 		];
+
+		// When exporting from a group context, restrict to that group's users and courses.
+		if ( ! empty( $data['group_id'] ) ) {
+			$group_id = Cast::to_int( $data['group_id'] );
+
+			// Use the plural `users_ids` key — that's the list sliced into chunks; the singular `user_ids` skips chunking.
+			$this->transient_data['users_ids']  = array_values(
+				array_map( 'intval', learndash_get_groups_user_ids( $group_id ) )
+			);
+			$this->transient_data['course_ids'] = learndash_group_enrolled_courses( $group_id );
+		}
 
 		// Use custom filters when they are provided in the request.
 		$this->transient_data = wp_parse_args(
 			$this->transient_data,
 			ld_propanel_load_post_data( $data )
 		);
+
+		// Preserve Reports admin-supplied users_ids; ld_propanel_load_post_data() rebuilds
+		// `filters` from $_GET only, so without this the list would be silently dropped and
+		// chunking would not engage on the very export path that needs it most.
+		if (
+			isset( $data['filters']['users_ids'] )
+			&& is_array( $data['filters']['users_ids'] )
+			&& ! empty( $data['filters']['users_ids'] )
+		) {
+			$this->transient_data['users_ids'] = array_values(
+				array_map( 'intval', $data['filters']['users_ids'] )
+			);
+		}
 
 		// Generate report filename and download URL.
 		$this->set_report_filenames( $data );
@@ -271,34 +398,28 @@ class Learndash_Admin_Data_Reports_Courses extends Learndash_Admin_Settings_Data
 
 		// Write CSV headers to the file.
 		$this->send_report_headers_to_csv();
-
-		/**
-		 * Return progress data for initialization phase.
-		 *
-		 * We are setting result count and total count explicitly here in order to force
-		 * another request. This is in order to circumvent the old pagination system that is no longer used.
-		 */
-		return [
-			'result_count'         => 1,
-			'total_count'          => 2,
-			'report_download_link' => $this->transient_data['report_url'],
-		];
 	}
 
 	/**
 	 * Fetch and process activity data for the report.
 	 *
 	 * @since 4.25.6
+	 * @since 5.1.6 Added the $user_ids_chunk parameter so the chunked dispatcher can restrict
+	 *        the activity query to a slice of users at a time.
+	 *
+	 * @param array<int>|null $user_ids_chunk Optional slice of user IDs to restrict the
+	 *                                        activity query to. When null, the legacy
+	 *                                        single-query behavior is preserved.
 	 *
 	 * @return array<string, mixed> The data array with processed results.
 	 */
-	private function fetch_and_save_activity_data(): array {
+	private function fetch_and_save_activity_data( ?array $user_ids_chunk = null ): array {
 		// Initialize array to store processed course progress data.
 		$course_progress_data = [];
 
 		// Build activity query arguments for fetching course progress data.
 		$activity_query_args = [
-			'post_types'      => 'sfwd-courses',
+			'post_types'      => LDLMS_Post_Types::get_post_type_slug( LDLMS_Post_Types::COURSE ),
 			'activity_types'  => 'course',
 			'activity_status' => '',
 			'orderby_order'   => 'users.display_name, posts.post_title',
@@ -306,6 +427,16 @@ class Learndash_Admin_Data_Reports_Courses extends Learndash_Admin_Settings_Data
 
 		// Merge with cached filter data from initialization.
 		$activity_query_args = wp_parse_args( $this->transient_data, $activity_query_args );
+
+		// When the dispatcher passes an explicit chunk of user IDs, restrict the activity
+		// query to that slice. This is what keeps the WHERE user_id IN (...) clause small
+		// enough to stay under max_allowed_packet on sites with very large user bases.
+		if (
+			is_array( $user_ids_chunk )
+			&& ! empty( $user_ids_chunk )
+		) {
+			$activity_query_args['user_ids'] = $user_ids_chunk;
+		}
 
 		// Be sure these expected fields are set.
 		$post_data_args = $this->transient_data;
@@ -378,8 +509,12 @@ class Learndash_Admin_Data_Reports_Courses extends Learndash_Admin_Settings_Data
 			}
 		}
 
-		// Save results to file.
-		$this->save_csv_data( $course_progress_data );
+		// Skip the CSV write when the chunk produced no rows so an empty chunk does not
+		// re-invoke the `learndash_csv_data` filter chain on the in-place file. Mirrors the
+		// guard in the quiz exporter's process_export_chunk().
+		if ( ! empty( $course_progress_data ) ) {
+			$this->save_csv_data( $course_progress_data );
+		}
 
 		// Update cached data with any changes.
 		$this->set_option_cache( $this->transient_key, $this->transient_data );
@@ -610,6 +745,41 @@ class Learndash_Admin_Data_Reports_Courses extends Learndash_Admin_Settings_Data
 	}
 
 	/**
+	 * Resolve the LearnDash course ID for a report row.
+	 *
+	 * Prefer `activity_course_id` from the user activity table so CSV columns stay
+	 * aligned with course progress even when the joined `post_id` differs.
+	 *
+	 * @since 5.1.4
+	 *
+	 * @param object $report_item Activity query result row.
+	 *
+	 * @return int
+	 */
+	private function resolve_report_course_id( $report_item ): int {
+		if ( ! is_object( $report_item ) ) {
+			return 0;
+		}
+
+		if (
+			property_exists( $report_item, 'activity_course_id' )
+			&& Cast::to_string( $report_item->activity_course_id ) !== ''
+			&& Cast::to_int( $report_item->activity_course_id ) > 0
+		) {
+			return absint( $report_item->activity_course_id );
+		}
+
+		if (
+			property_exists( $report_item, 'post_id' )
+			&& ! empty( $report_item->post_id )
+		) {
+			return absint( $report_item->post_id );
+		}
+
+		return 0;
+	}
+
+	/**
 	 * Handles display formatting of report column value.
 	 *
 	 * @since 2.3.0
@@ -622,14 +792,7 @@ class Learndash_Admin_Data_Reports_Courses extends Learndash_Admin_Settings_Data
 	 * @return mixed $column_value;
 	 */
 	public function report_column( $column_value, $column_key, $report_item, $report_user ) {
-		if (
-			property_exists( $report_item, 'post_id' )
-			&& ! empty( $report_item->post_id )
-		) {
-			$course_id = absint( $report_item->post_id );
-		} else {
-			$course_id = 0;
-		}
+		$course_id = $this->resolve_report_course_id( $report_item );
 
 		switch ( $column_key ) {
 			case 'user_id':
@@ -656,7 +819,10 @@ class Learndash_Admin_Data_Reports_Courses extends Learndash_Admin_Settings_Data
 				break;
 
 			case 'course_title':
-				if ( property_exists( $report_item, 'post_title' ) ) {
+				if ( ! empty( $course_id ) ) {
+					$column_value = get_the_title( $course_id );
+					$column_value = str_replace( '’', "'", $column_value );
+				} elseif ( property_exists( $report_item, 'post_title' ) ) {
 					$column_value = $report_item->post_title;
 					$column_value = str_replace( '’', "'", $column_value );
 				}
@@ -731,8 +897,8 @@ class Learndash_Admin_Data_Reports_Courses extends Learndash_Admin_Settings_Data
 					) {
 						if ( true === (bool) $report_item->activity_status ) {
 							if (
-								( property_exists( $report_item, 'activity_completed' ) )
-								&& ( ! empty( $report_item->activity_completed ) )
+								property_exists( $report_item, 'activity_completed' )
+								&& ! empty( $report_item->activity_completed )
 							) {
 								return learndash_adjust_date_time_display( $report_item->activity_completed, 'Y-m-d' );
 							}

@@ -8,7 +8,7 @@ Tags: certificates, course certificates, quiz certificates
 Requires at least: 5.0
 Tested up to: 6.2.2
 Requires PHP: 7.0
-Stable tag: 1.1.4
+Stable tag: 1.1.5
 
 Create certificates using the Gutenberg block editor.
 

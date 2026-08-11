@@ -65,8 +65,7 @@ class Core_Columns extends Block {
 				$inner_html .= '<div id="' . $column['id'] . '"><div style="height:1px;"></div></div>';
 			}
 		}
-		$client = new HtmlDocument();
-		$client->load( $this->block['innerHTML'] );
+		$client = new HtmlDocument( $this->block['innerHTML'] ?? '' );
 		$client->lastChild()->innertext = $inner_html;
 		$html                           = $client->save();
 		$this->html->add( $html );

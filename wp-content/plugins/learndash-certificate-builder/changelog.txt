@@ -1,3 +1,14 @@
+= [1.1.5] 2026-02-25 =
+
+* Fix - Resolved a deprecation warning related to `trim()` usage.
+* Fix - Resolved an issue where background images may not load when viewing a Certificate.
+
+= [1.1.4] 2026-01-08 =
+
+* Fix - Resolved `_load_textdomain_just_in_time()` notice errors that showed up in Wordpress 6.8.
+* Tweak - Improved Block compatibility with WordPress 6.9.
+* Tweak - Updated minimum required WordPress version from 6.1 to 6.6.
+
 = [1.1.3.1] =
 
 * Fix - Resolved a fatal error when rendering certificate download URLs.

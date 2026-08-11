@@ -130,9 +130,9 @@ class Admin
         wp_enqueue_script(Config::SLUG . 'elfinder-editor-script');
         wp_enqueue_script(Config::SLUG . 'elfinder-lang', $preferences->getLangUrl(), [Config::SLUG . 'elfinder-script']);
 
-        if (Config::isDev()) {
-            $port   = file_get_contents(Config::get('BASEDIR') . '/port');
-            $devUrl = 'http://localhost:' . $port;
+        $devPort = Config::devPort();
+        if ($devPort > 0) {
+            $devUrl = 'http://localhost:' . $devPort;
             wp_enqueue_script(
                 Config::SLUG . '-MODULE-vite-client-helper',
                 $devUrl . '/config/devHotModule.js',
@@ -266,7 +266,7 @@ class Admin
             'postMaxSize'        => esc_html(\ini_get('post_max_size')),
             'memoryLimit'        => esc_html(\ini_get('memory_limit')),
             'maxExecutionTime'   => esc_html(\ini_get('max_execution_time')),
-            'ua'                 => esc_html($_SERVER['HTTP_USER_AGENT']),
+            'ua'                 => isset($_SERVER['HTTP_USER_AGENT']) ? sanitize_text_field(wp_unslash($_SERVER['HTTP_USER_AGENT'])) : '',
             'fileEditNotAllowed' => \defined('DISALLOW_FILE_EDIT') && DISALLOW_FILE_EDIT,
         ];
     }
