@@ -85,7 +85,7 @@
 }
 
 /* Links */
-.editor-content a {
+.editor-content a:not([class*="ld-"]):not(.sa-btn) {
 	color: var(--sagicc-primary, #0052FF);
 	font-weight: 600;
 	text-decoration: underline;
@@ -94,9 +94,13 @@
 	transition: color 0.15s ease, text-decoration-color 0.15s ease;
 }
 
-.editor-content a:hover {
+.editor-content a:not([class*="ld-"]):not(.sa-btn):hover {
 	color: #003ECC;
 	text-decoration-color: #003ECC;
+}
+
+.editor-content .learndash-wrapper a {
+	text-decoration: none;
 }
 
 /* Lists */
@@ -291,7 +295,7 @@
 	text-align: left !important;
 }
 
-/* LearnDash & Course Content Alignment */
+/* LearnDash & Course Content Alignment & Button Overrides */
 .sa-course-content,
 .sa-course-content > *,
 .sa-course-content .learndash-wrapper,
@@ -302,6 +306,8 @@
 	margin-left: 0 !important;
 	max-width: 100% !important;
 }
+
+
 
 /* ==========================================================================
    Utilities & Ajax Search Lite Styling
