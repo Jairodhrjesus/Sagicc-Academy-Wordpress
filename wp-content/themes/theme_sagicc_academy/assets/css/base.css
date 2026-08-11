@@ -1,0 +1,164 @@
+/* ==========================================================================
+   1. Design System & CSS Variables
+   ========================================================================== */
+:root {
+	--sagicc-primary: #0052FF;
+	--sagicc-secondary: #0F172A;
+	--sagicc-gray-50: #F8FAFC;
+	--sagicc-gray-100: #F1F5F9;
+	--sagicc-gray-200: #E2E8F0;
+	--sagicc-gray-300: #CBD5E1;
+	--sagicc-gray-400: #94A3B8;
+	--sagicc-gray-500: #64748B;
+	--sagicc-gray-600: #475569;
+	--sagicc-gray-900: #0F172A;
+	--sagicc-white: #FFFFFF;
+
+	--sagicc-red-50: #FEF2F2;
+	--sagicc-red-100: #FEE2E2;
+	--sagicc-red-600: #DC2626;
+
+	--sagicc-green-50: #F0FDF4;
+	--sagicc-green-100: #DCFCE7;
+	--sagicc-green-500: #22C55E;
+	--sagicc-green-600: #16A34A;
+
+	--font-sans: 'Inter', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+	--font-heading: 'Outfit', 'Inter', system-ui, sans-serif;
+}
+
+/* ==========================================================================
+   2. Reset & Base Layout
+   ========================================================================== */
+*, *::before, *::after {
+	box-sizing: border-box;
+	margin: 0;
+	padding: 0;
+}
+
+body {
+	font-family: var(--font-sans);
+	background-color: var(--sagicc-white);
+	color: var(--sagicc-secondary);
+	line-height: 1.5;
+	-webkit-font-smoothing: antialiased;
+}
+
+/* App Layout Grid */
+.sa-layout {
+	display: flex;
+	min-height: 100vh;
+	background-color: var(--sagicc-white);
+	color: var(--sagicc-gray-900);
+}
+
+.sa-main {
+	flex: 1;
+	padding: 2rem;
+	overflow-y: auto;
+	background-color: var(--sagicc-white);
+	font-family: var(--font-sans);
+}
+
+@media (min-width: 1024px) {
+	.sa-main {
+		padding: 3rem;
+	}
+}
+
+.sa-main-full {
+	width: 100%;
+}
+
+.sa-container {
+	width: 100%;
+	margin-left: auto;
+	margin-right: auto;
+}
+
+/* ==========================================================================
+   Utilities & Helper Classes
+   ========================================================================== */
+.hidden { display: none !important; }
+.flex { display: flex !important; }
+.inline-flex { display: inline-flex !important; }
+.block { display: block !important; }
+.inline-block { display: inline-block !important; }
+
+.flex-col { flex-direction: column !important; }
+.flex-1 { flex: 1 1 0% !important; }
+.flex-wrap { flex-wrap: wrap !important; }
+.items-center { align-items: center !important; }
+.justify-center { justify-content: center !important; }
+.justify-between { justify-content: space-between !important; }
+
+.gap-1 { gap: 0.25rem !important; }
+.gap-2 { gap: 0.5rem !important; }
+.gap-3 { gap: 0.75rem !important; }
+.gap-4 { gap: 1rem !important; }
+.gap-6 { gap: 1.5rem !important; }
+.gap-8 { gap: 2rem !important; }
+
+.relative { position: relative !important; }
+.absolute { position: absolute !important; }
+.fixed { position: fixed !important; }
+.sticky { position: sticky !important; }
+.inset-0 { top: 0; right: 0; bottom: 0; left: 0; }
+.top-0 { top: 0 !important; }
+.z-10 { z-index: 10 !important; }
+.z-50 { z-index: 50 !important; }
+
+.w-full { width: 100% !important; }
+.h-full { height: 100% !important; }
+.min-h-screen { min-height: 100vh !important; }
+
+.text-left { text-align: left !important; }
+.text-center { text-align: center !important; }
+.text-right { text-align: right !important; }
+
+.font-sans { font-family: var(--font-sans) !important; }
+.font-bold { font-weight: 700 !important; }
+.font-black { font-weight: 900 !important; }
+.font-medium { font-weight: 500 !important; }
+.font-semibold { font-weight: 600 !important; }
+
+.text-xs { font-size: 0.75rem !important; }
+.text-sm { font-size: 0.875rem !important; }
+.text-base { font-size: 1rem !important; }
+.text-lg { font-size: 1.125rem !important; }
+.text-xl { font-size: 1.25rem !important; }
+.text-2xl { font-size: 1.5rem !important; }
+.text-3xl { font-size: 1.875rem !important; }
+.text-4xl { font-size: 2.25rem !important; }
+
+.text-white { color: #FFFFFF !important; }
+.text-secondary { color: var(--sagicc-secondary) !important; }
+.text-sagicc { color: var(--sagicc-primary) !important; }
+.text-gray-300 { color: var(--sagicc-gray-300) !important; }
+.text-gray-400 { color: var(--sagicc-gray-400) !important; }
+.text-gray-500 { color: var(--sagicc-gray-500) !important; }
+.text-gray-600 { color: var(--sagicc-gray-600) !important; }
+
+.bg-white { background-color: #FFFFFF !important; }
+.bg-secondary { background-color: var(--sagicc-secondary) !important; }
+.bg-gray-50 { background-color: var(--sagicc-gray-50) !important; }
+
+.rounded-lg { border-radius: 0.5rem !important; }
+.rounded-xl { border-radius: 0.75rem !important; }
+.rounded-2xl { border-radius: 1rem !important; }
+.rounded-3xl { border-radius: 1.5rem !important; }
+.rounded-full { border-radius: 9999px !important; }
+
+.shadow-sm { box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05) !important; }
+.shadow-md { box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1) !important; }
+.shadow-lg { box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1) !important; }
+.shadow-2xl { box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25) !important; }
+
+.transition-all { transition: all 0.2s ease !important; }
+.transition-colors { transition: color 0.2s ease, background-color 0.2s ease !important; }
+.cursor-pointer { cursor: pointer !important; }
+.overflow-hidden { overflow: hidden !important; }
+.overflow-y-auto { overflow-y: auto !important; }
+
+.backdrop-blur-sm { backdrop-filter: blur(4px); -webkit-backdrop-filter: blur(4px); }
+.bg-secondary\/40 { background-color: rgba(15, 23, 42, 0.4) !important; }

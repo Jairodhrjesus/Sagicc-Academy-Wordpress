@@ -1,0 +1,171 @@
+/* ==========================================================================
+   Gutenberg Content Styling (.editor-content)
+   ========================================================================== */
+.editor-content h1 {
+	font-size: 2.25rem;
+	font-weight: 900;
+	color: var(--sagicc-secondary);
+	letter-spacing: -0.05em;
+	margin-top: 2rem;
+	margin-bottom: 1rem;
+}
+
+.editor-content h2 {
+	font-size: 1.5rem;
+	font-weight: 800;
+	color: var(--sagicc-secondary);
+	letter-spacing: -0.025em;
+	margin-top: 1.5rem;
+	margin-bottom: 0.75rem;
+}
+
+.editor-content h3 {
+	font-size: 1.25rem;
+	font-weight: 700;
+	color: var(--sagicc-secondary);
+	letter-spacing: -0.025em;
+	margin-top: 1.25rem;
+	margin-bottom: 0.5rem;
+}
+
+.editor-content h4 {
+	font-size: 1.125rem;
+	font-weight: 600;
+	color: var(--sagicc-secondary);
+	margin-top: 1rem;
+	margin-bottom: 0.5rem;
+}
+
+.editor-content p {
+	color: var(--sagicc-gray-600);
+	font-size: 1rem;
+	line-height: 1.625;
+	margin-bottom: 1rem;
+}
+
+.editor-content ul {
+	list-style-type: disc;
+	padding-left: 1.5rem;
+	margin-bottom: 1rem;
+	color: var(--sagicc-gray-600);
+}
+
+.editor-content ul > li + li {
+	margin-top: 0.25rem;
+}
+
+.editor-content ol {
+	list-style-type: decimal;
+	padding-left: 1.5rem;
+	margin-bottom: 1rem;
+	color: var(--sagicc-gray-600);
+}
+
+.editor-content ol > li + li {
+	margin-top: 0.25rem;
+}
+
+.editor-content a {
+	color: var(--sagicc-primary);
+	font-weight: 700;
+	text-decoration: none;
+}
+
+.editor-content a:hover {
+	text-decoration: underline;
+}
+
+.editor-content blockquote {
+	border-left: 4px solid var(--sagicc-gray-200);
+	padding-left: 1rem;
+	font-style: italic;
+	margin: 1rem 0;
+	color: var(--sagicc-gray-500);
+}
+
+/* ==========================================================================
+   Utilities & Ajax Search Lite Styling
+   ========================================================================== */
+.scrollbar-hide::-webkit-scrollbar {
+	display: none;
+}
+
+.scrollbar-hide {
+	-ms-overflow-style: none;
+	scrollbar-width: none;
+}
+
+/* Ajax Search Lite Integrations */
+div[id*="ajaxsearchlite"].asl_w, 
+div[id*="ajaxsearchlite"].asl_w .probox {
+	background: #F8FAFC !important;
+	border: 1px solid #E2E8F0 !important;
+	border-radius: 1rem !important;
+	box-shadow: none !important;
+}
+
+div[id*="ajaxsearchlite"].asl_w .probox .proinput input {
+	color: #0F172A !important;
+}
+
+div[id*="ajaxsearchlite"].asl_w .probox .proinput input::placeholder {
+	color: #94A3B8 !important;
+}
+
+div[id*="ajaxsearchlite"].asl_w .probox .promagnifier,
+div[id*="ajaxsearchlite"].asl_w .probox .proloading,
+div[id*="ajaxsearchlite"].asl_w .probox .proclose {
+	background: transparent !important;
+	border: none !important;
+	box-shadow: none !important;
+}
+
+div[id*="ajaxsearchlite"].asl_w .probox .promagnifier .asl_magnifier_svg {
+	fill: #94A3B8 !important;
+}
+
+div[id*="ajaxsearchlite"].asl_r,
+div[id*="ajaxsearchlite"].asl_r * {
+	background: #FFFFFF !important;
+	color: #0F172A !important;
+	border-color: #F1F5F9 !important;
+}
+
+div[id*="ajaxsearchlite"].asl_r {
+	border: 1px solid #F1F5F9 !important;
+	border-radius: 1.5rem !important;
+	box-shadow: 0 20px 25px -5px rgba(0,0,0,0.1), 0 8px 10px -6px rgba(0,0,0,0.1) !important;
+}
+
+div[id*="ajaxsearchlite"].asl_r .results .item {
+	border-radius: 1rem !important;
+}
+
+div[id*="ajaxsearchlite"].asl_r .results .item:hover,
+div[id*="ajaxsearchlite"].asl_r .results .item:hover * {
+	background: #F8FAFC !important;
+}
+
+div[id*="ajaxsearchlite"].asl_r .results .item .asl_image {
+	border-radius: 0.75rem !important;
+}
+
+div[id*="ajaxsearchlite"].asl_r .results .item .asl_content h3 a {
+	color: #0F172A !important;
+}
+
+div[id*="ajaxsearchlite"].asl_r .results .item .asl_content h3 a:hover {
+	color: #0052FF !important;
+}
+
+div[id*="ajaxsearchlite"].asl_r .results .item .asl_content {
+	color: #64748B !important;
+}
+
+div[id*="ajaxsearchlite"].asl_r .results {
+	scrollbar-width: none !important;
+}
+
+div[id*="ajaxsearchlite"].asl_r .results::-webkit-scrollbar {
+	display: none !important;
+}

@@ -137,7 +137,7 @@ if ($is_logged_in) {
 
 if (empty($user_avatar)) {
 	$icon = $is_logged_in ? 'fa-user-gear' : 'fa-user-lock';
-	$user_avatar = '<span class="sa-avatar-sm-placeholder"><i class="fa-solid ' . esc_attr($icon) . ' text-xs"></i></span>';
+	$user_avatar = '<span class="sa-avatar-sm-placeholder"><i class="fa-solid ' . esc_attr($icon) . '"></i></span>';
 }
 
 $theme_uri = get_stylesheet_directory_uri();
@@ -149,7 +149,7 @@ $theme_uri = get_stylesheet_directory_uri();
 		<div class="sa-sidebar-logo-container">
 			<a href="<?php echo esc_url($dashboard_url); ?>" id="sidebar-logo" class="sa-sidebar-logo-link">
 				<img src="<?php echo esc_url($theme_uri . '/assets/Sagicc-Academy-Logo.svg'); ?>" alt="Sagicc Academy" class="sa-sidebar-logo full-logo" />
-				<img src="<?php echo esc_url($theme_uri . '/assets/isotipo-sagicc-academy.svg'); ?>" alt="Sagicc Academy" class="sa-sidebar-logo isotype-logo hidden" />
+				<img src="<?php echo esc_url($theme_uri . '/assets/isotipo-sagicc-academy.svg'); ?>" alt="Sagicc Academy" class="sa-sidebar-logo isotype-logo sa-hidden" />
 			</a>
 		</div>
 
@@ -159,11 +159,6 @@ $theme_uri = get_stylesheet_directory_uri();
 				<a href="<?php echo esc_url($dashboard_url); ?>" class="sa-sidebar-link active" title="<?php echo esc_attr($t('dashboard.title')); ?>">
 					<i class="fa-solid fa-table-columns"></i>
 					<span class="sidebar-text"><?php echo esc_html($t('dashboard.title')); ?></span>
-				</a>
-				<a data-search-trigger class="sa-sidebar-link" title="<?php echo esc_attr($t('dashboard.search')); ?>">
-					<i class="fa-solid fa-magnifying-glass"></i>
-					<span class="sidebar-text"><?php echo esc_html($t('dashboard.search')); ?></span>
-					<span class="sidebar-text sa-sidebar-shortcut">⌘P</span>
 				</a>
 			</nav>
 
@@ -228,49 +223,51 @@ $theme_uri = get_stylesheet_directory_uri();
 	</div>
 
 	<!-- FOOTER ACTIONS -->
-	<div class="mt-auto border-t border-gray-100 py-4 bg-white z-10 px-4">
-		<div class="footer-icons flex items-center justify-between transition-all duration-300 w-full">
-			<div class="flex items-center justify-center w-10 h-10">
+	<div class="sa-sidebar-footer">
+		<div class="sa-sidebar-footer-icons">
+			<div class="sa-sidebar-footer-item">
 				<button id="sidebar-toggle-btn"
-					class="flex items-center justify-center p-2 text-gray-400 hover:text-secondary transition-colors">
-					<i class="fa-solid fa-window-maximize text-sm"></i>
+					type="button"
+					class="sa-sidebar-footer-btn"
+					title="<?php echo esc_attr($lang === 'es' ? 'Contraer / Expandir' : 'Collapse / Expand'); ?>">
+					<i class="fa-solid fa-window-maximize"></i>
 				</button>
 			</div>
 
-			<div class="flex items-center justify-center w-10 h-10">
+			<div class="sa-sidebar-footer-item">
 				<a href="<?php echo esc_url($user_profile_url); ?>"
-					class="flex items-center justify-center p-1 hover:bg-gray-50 rounded-full transition-all"
+					class="sa-sidebar-footer-btn"
 					title="<?php echo esc_attr($user_title); ?>">
 					<?php echo $user_avatar; ?>
 				</a>
 			</div>
 
-			<div class="flex items-center justify-center w-10 h-10">
+			<div class="sa-sidebar-footer-item">
 				<!-- Language Switcher Container -->
-				<div class="relative lang-switcher-container">
+				<div class="sa-lang-container">
 					<button
-						class="lang-toggle flex items-center justify-center p-2 text-gray-400 hover:text-secondary transition-colors"
+						type="button"
+						class="lang-toggle sa-sidebar-footer-btn"
 						title="<?php echo esc_attr($lang === 'es' ? 'Idioma' : 'Language'); ?>">
-						<i class="fa-solid fa-language text-lg"></i>
+						<i class="fa-solid fa-language"></i>
 					</button>
 
 					<!-- Dropdown -->
-					<div
-						class="lang-dropdown hidden absolute bg-white border border-gray-100 rounded-xl shadow-lg overflow-hidden min-w-[140px] z-50 bottom-full mb-2 left-1/2 -translate-x-1/2">
+					<div class="lang-dropdown sa-lang-dropdown sa-hidden">
 						<a href="<?php echo esc_url($es_url); ?>" data-lang="es"
-							class="lang-option w-full px-4 py-2.5 text-left text-xs font-bold transition-all flex items-center gap-2 <?php echo $lang === 'es' ? 'bg-gray-50 text-secondary' : 'text-gray-400 hover:bg-gray-50 hover:text-secondary'; ?>">
-							<span class="text-xs text-gray-400">ES</span>
+							class="lang-option sa-lang-option <?php echo $lang === 'es' ? 'active' : ''; ?>">
+							<span class="sa-lang-tag">ES</span>
 							Español
 							<?php if ($lang === 'es'): ?>
-								<i class="fa-solid fa-check text-[10px] ml-auto text-secondary"></i>
+								<i class="fa-solid fa-check sa-lang-check"></i>
 							<?php endif; ?>
 						</a>
 						<a href="<?php echo esc_url($en_url); ?>" data-lang="en"
-							class="lang-option w-full px-4 py-2.5 text-left text-xs font-bold transition-all flex items-center gap-2 <?php echo $lang === 'en' ? 'bg-gray-50 text-secondary' : 'text-gray-400 hover:bg-gray-50 hover:text-secondary'; ?>">
-							<span class="text-xs text-gray-400">EN</span>
+							class="lang-option sa-lang-option <?php echo $lang === 'en' ? 'active' : ''; ?>">
+							<span class="sa-lang-tag">EN</span>
 							English
 							<?php if ($lang === 'en'): ?>
-								<i class="fa-solid fa-check text-[10px] ml-auto text-secondary"></i>
+								<i class="fa-solid fa-check sa-lang-check"></i>
 							<?php endif; ?>
 						</a>
 					</div>
@@ -278,11 +275,12 @@ $theme_uri = get_stylesheet_directory_uri();
 			</div>
 
 			<?php if ($is_logged_in): ?>
-				<div class="flex items-center justify-center w-10 h-10">
+				<div class="sa-sidebar-footer-item">
 					<button id="logout-btn"
-						class="flex items-center justify-center p-2 text-gray-400 hover:text-red-500 transition-colors"
+						type="button"
+						class="sa-sidebar-footer-btn sa-sidebar-footer-btn-danger"
 						title="<?php echo esc_attr($t('dashboard.logout')); ?>">
-						<i class="fa-solid fa-right-from-bracket text-sm"></i>
+						<i class="fa-solid fa-right-from-bracket"></i>
 					</button>
 				</div>
 			<?php endif; ?>
@@ -291,27 +289,26 @@ $theme_uri = get_stylesheet_directory_uri();
 
 	<!-- LOGOUT CONFIRMATION MODAL -->
 	<?php if ($is_logged_in): ?>
-		<div id="logout-modal" class="fixed inset-0 z-[999999] hidden anim-fade-in group/modal">
-			<div class="absolute inset-0 bg-secondary/40 backdrop-blur-sm"></div>
-			<div class="absolute inset-0 flex items-center justify-center p-4">
-				<div
-					class="bg-white rounded-3xl p-8 max-w-sm w-full shadow-2xl scale-95 opacity-0 modal-content transition-all duration-300">
-					<div class="w-16 h-16 bg-red-50 text-red-500 rounded-2xl flex items-center justify-center mb-6 mx-auto">
-						<i class="fa-solid fa-right-from-bracket text-2xl"></i>
+		<div id="logout-modal" class="sa-modal sa-hidden">
+			<div class="sa-modal-backdrop"></div>
+			<div class="sa-modal-container">
+				<div class="sa-modal-card modal-content">
+					<div class="sa-logout-icon">
+						<i class="fa-solid fa-right-from-bracket"></i>
 					</div>
-					<h3 class="text-2xl font-black text-secondary text-center mb-2">
+					<h3 class="sa-modal-title">
 						<?php echo esc_html($t('auth.logout_confirm_title')); ?>
 					</h3>
-					<p class="text-gray-400 text-center font-medium mb-8">
+					<p class="sa-modal-desc">
 						<?php echo esc_html($t('auth.logout_confirm_desc')); ?>
 					</p>
-					<div class="flex flex-col w-full gap-3">
+					<div class="sa-modal-actions">
 						<button id="confirm-logout" data-logout-url="<?php echo esc_url(wp_logout_url(home_url('/'))); ?>"
-							class="w-full py-4 bg-red-500 text-white rounded-2xl font-black text-base hover:bg-red-600 transition-all shadow-lg shadow-red-500/20 active:scale-95">
+							class="sa-btn-danger">
 							<?php echo esc_html($t('auth.logout_confirm_btn')); ?>
 						</button>
 						<button id="cancel-logout"
-							class="w-full py-4 bg-gray-50 text-gray-400 rounded-2xl font-black text-base hover:bg-gray-100 hover:text-secondary transition-all active:scale-95">
+							class="sa-btn-cancel">
 							<?php echo esc_html($t('auth.logout_cancel_btn')); ?>
 						</button>
 					</div>
@@ -320,86 +317,6 @@ $theme_uri = get_stylesheet_directory_uri();
 		</div>
 	<?php endif; ?>
 </aside>
-
-<!-- SEARCH MODAL -->
-<div id="search-modal" class="fixed inset-0 z-[999999] hidden items-center justify-center p-4 anim-fade-in font-sans">
-	<div class="absolute inset-0 bg-secondary/40 backdrop-blur-sm" id="search-modal-overlay"></div>
-	<div class="relative bg-white rounded-3xl p-6 max-w-2xl w-full shadow-2xl scale-95 opacity-0 search-modal-content transition-all duration-300">
-		<div class="flex items-center justify-between mb-4 border-b border-gray-100 pb-4">
-			<h3 class="text-xl font-bold text-secondary flex items-center gap-2">
-				<i class="fa-solid fa-magnifying-glass text-sagicc text-base"></i>
-				<?php echo esc_html($lang === 'es' ? 'Buscar en la Academia' : 'Search the Academy'); ?>
-			</h3>
-			<button id="close-search-btn" class="text-gray-400 hover:text-secondary transition-colors p-1">
-				<i class="fa-solid fa-xmark text-lg"></i>
-			</button>
-		</div>
-		<div class="wp-search-box">
-			<?php echo do_shortcode('[wpdreams_ajaxsearchlite]'); ?>
-		</div>
-	</div>
-</div>
-
-<style>
-	/* Ajustes cuando el sidebar está contraído */
-	.sidebar-collapsed .lang-dropdown {
-		bottom: auto !important;
-		top: -20px !important;
-		left: 100% !important;
-		transform: none !important;
-		margin-left: 10px !important;
-	}
-
-	/* COLLAPSED STATE STYLES */
-	#sidebar.sidebar-collapsed {
-		width: 6rem;
-	}
-
-	.sidebar-collapsed .p-6 {
-		padding-left: 0.75rem;
-		padding-right: 0.75rem;
-	}
-
-	.sidebar-collapsed nav a {
-		justify-content: center;
-		padding-left: 0;
-		padding-right: 0;
-	}
-
-	.sidebar-collapsed .sidebar-text {
-		display: none;
-	}
-
-	.sidebar-collapsed i {
-		margin: 0 !important;
-		width: auto !important;
-		font-size: 1.1rem;
-	}
-
-	.sidebar-collapsed .footer-icons {
-		padding-left: 0;
-		padding-right: 0;
-	}
-
-	.sidebar-collapsed .footer-icons button {
-		padding: 0.75rem;
-		width: 100%;
-	}
-
-	.sidebar-collapsed .full-logo {
-		display: none !important;
-	}
-
-	.sidebar-collapsed .isotype-logo {
-		display: block !important;
-		margin: 0 auto;
-	}
-
-	.sidebar-collapsed #sidebar-logo {
-		justify-content: center;
-		width: 100%;
-	}
-</style>
 
 <script>
 	(function () {
@@ -413,19 +330,12 @@ $theme_uri = get_stylesheet_directory_uri();
 			if (sidebar.dataset.initialized) return;
 
 			const applyState = (isCollapsed) => {
-				const footerIcons = document.querySelector(".footer-icons");
 				if (isCollapsed) {
 					sidebar.classList.add("sidebar-collapsed");
-					sidebar.classList.replace("w-72", "w-24");
-					texts.forEach((t) => t.classList.add("hidden"));
-					footerIcons?.classList.add("flex-col", "gap-4", "items-center");
-					footerIcons?.classList.remove("justify-between");
+					texts.forEach((t) => t.classList.add("sa-hidden"));
 				} else {
 					sidebar.classList.remove("sidebar-collapsed");
-					sidebar.classList.replace("w-24", "w-72");
-					texts.forEach((t) => t.classList.remove("hidden"));
-					footerIcons?.classList.remove("flex-col", "gap-4", "items-center");
-					footerIcons?.classList.add("justify-between");
+					texts.forEach((t) => t.classList.remove("sa-hidden"));
 				}
 				localStorage.setItem("sidebar-collapsed", String(isCollapsed));
 			};
@@ -438,11 +348,10 @@ $theme_uri = get_stylesheet_directory_uri();
 			logoutBtn?.addEventListener("click", () => {
 				const modal = document.getElementById("logout-modal");
 				if (modal) {
-					modal.classList.remove("hidden");
-					modal.classList.add("flex");
-					sidebar.classList.add("z-[999999]");
+					modal.classList.remove("sa-hidden");
+					document.body.style.overflow = "hidden";
 					setTimeout(() => {
-						modal.querySelector(".modal-content")?.classList.remove("scale-95", "opacity-0");
+						modal.querySelector(".modal-content")?.classList.add("active");
 					}, 10);
 				}
 			});
@@ -452,17 +361,16 @@ $theme_uri = get_stylesheet_directory_uri();
 			const confirmBtn = document.getElementById("confirm-logout");
 
 			const closeModal = () => {
-				modal?.querySelector(".modal-content")?.classList.add("scale-95", "opacity-0");
+				modal?.querySelector(".modal-content")?.classList.remove("active");
 				setTimeout(() => {
-					modal?.classList.add("hidden");
-					modal?.classList.remove("flex");
-					sidebar.classList.remove("z-[999999]");
+					modal?.classList.add("sa-hidden");
+					document.body.style.overflow = "";
 				}, 200);
 			};
 
 			cancelBtn?.addEventListener("click", closeModal);
 			modal?.addEventListener("click", (e) => {
-				if (e.target === modal) closeModal();
+				if (e.target === modal || e.target.classList.contains("sa-modal-backdrop") || e.target.classList.contains("sa-modal-container")) closeModal();
 			});
 
 			confirmBtn?.addEventListener("click", () => {
@@ -473,28 +381,26 @@ $theme_uri = get_stylesheet_directory_uri();
 			sidebar.dataset.initialized = "true";
 
 			if (localStorage.getItem("sidebar-collapsed") === "true") {
-				sidebar.classList.add("duration-0");
 				applyState(true);
-				setTimeout(() => sidebar.classList.remove("duration-0"), 50);
 			}
 		}
 
 		function setupLanguageSwitchers() {
-			const containers = document.querySelectorAll(".lang-switcher-container");
+			const containers = document.querySelectorAll(".sa-lang-container");
 
 			containers.forEach((container) => {
 				const toggle = container.querySelector(".lang-toggle");
-				const dropdown = container.querySelector(".lang-dropdown");
-				const options = container.querySelectorAll(".lang-option");
+				const dropdown = container.querySelector(".sa-lang-dropdown");
+				const options = container.querySelectorAll(".sa-lang-option");
 
 				if (!toggle || !dropdown) return;
 
 				toggle.addEventListener("click", (e) => {
 					e.stopPropagation();
-					document.querySelectorAll(".lang-dropdown").forEach((d) => {
-						if (d !== dropdown) d.classList.add("hidden");
+					document.querySelectorAll(".sa-lang-dropdown").forEach((d) => {
+						if (d !== dropdown) d.classList.add("sa-hidden");
 					});
-					dropdown.classList.toggle("hidden");
+					dropdown.classList.toggle("sa-hidden");
 				});
 
 				options.forEach((opt) => {
@@ -506,57 +412,11 @@ $theme_uri = get_stylesheet_directory_uri();
 			});
 		}
 
-		function setupSearchModal() {
-			const trigger = document.querySelector("[data-search-trigger]");
-			const modal = document.getElementById("search-modal");
-			const overlay = document.getElementById("search-modal-overlay");
-			const closeBtn = document.getElementById("close-search-btn");
-			const content = modal?.querySelector(".search-modal-content");
-
-			if (!modal || !trigger) return;
-
-			const openSearch = () => {
-				modal.classList.remove("hidden");
-				modal.classList.add("flex");
-				setTimeout(() => {
-					content?.classList.remove("scale-95", "opacity-0");
-					const searchInput = modal.querySelector(".orig");
-					if (searchInput) searchInput.focus();
-				}, 50);
-			};
-
-			const closeSearch = () => {
-				content?.classList.add("scale-95", "opacity-0");
-				setTimeout(() => {
-					modal.classList.add("hidden");
-					modal.classList.remove("flex");
-				}, 200);
-			};
-
-			trigger.addEventListener("click", (e) => {
-				e.preventDefault();
-				openSearch();
-			});
-			closeBtn?.addEventListener("click", closeSearch);
-			overlay?.addEventListener("click", closeSearch);
-
-			document.addEventListener("keydown", (e) => {
-				if (e.key === "Escape" && !modal.classList.contains("hidden")) {
-					closeSearch();
-				}
-				if ((e.ctrlKey || e.metaKey) && e.key === "p") {
-					e.preventDefault();
-					openSearch();
-				}
-			});
-		}
-
 		document.addEventListener("DOMContentLoaded", () => {
 			setupSidebar();
 			setupLanguageSwitchers();
-			setupSearchModal();
 			document.addEventListener("click", () => {
-				document.querySelectorAll(".lang-dropdown").forEach((d) => d.classList.add("hidden"));
+				document.querySelectorAll(".sa-lang-dropdown").forEach((d) => d.classList.add("sa-hidden"));
 			});
 		});
 	})();

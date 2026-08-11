@@ -32,8 +32,10 @@ require get_template_directory() . '/inc/shortcodes.php';
 // Register Custom Post Types (Videos)
 require get_template_directory() . '/inc/post-types.php';
 
-// Restrict Ajax Search Lite to Sagicc Academy content (courses, lessons, topics, videos, guides)
+// Restrict and optimize Ajax Search Lite for maximum response speed
 add_filter( 'asl_query_args', function ( $args, $search_id ) {
 	$args['post_type'] = array( 'sfwd-courses', 'sfwd-lessons', 'sfwd-topic', 'video', 'guia' );
+	$args['posts_per_page'] = 6;
+	$args['post_count'] = 6;
 	return $args;
 }, 99, 2 );

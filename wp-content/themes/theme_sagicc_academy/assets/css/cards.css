@@ -1,0 +1,218 @@
+/* ==========================================================================
+   Buttons Component
+   ========================================================================== */
+.sa-btn {
+	display: inline-flex;
+	align-items: center;
+	justify-content: center;
+	gap: 0.5rem;
+	padding: 1rem 2rem;
+	border-radius: 1rem;
+	font-weight: 900;
+	font-size: 1rem;
+	text-decoration: none;
+	transition: all 0.2s ease;
+	cursor: pointer;
+	border: none;
+	font-family: var(--font-sans);
+}
+
+.sa-btn:active {
+	transform: scale(0.95);
+}
+
+.sa-btn-primary {
+	background-color: var(--sagicc-white);
+	color: var(--sagicc-secondary);
+	box-shadow: 0 20px 25px -5px rgba(255, 255, 255, 0.1);
+}
+
+.sa-btn-primary:hover {
+	background-color: var(--sagicc-gray-100);
+}
+
+.sa-btn-secondary {
+	background-color: var(--sagicc-secondary);
+	color: var(--sagicc-white);
+}
+
+.sa-btn-secondary:hover {
+	background-color: rgba(15, 23, 42, 0.8);
+}
+
+.sa-btn-outline {
+	background-color: rgba(255, 255, 255, 0.1);
+	color: var(--sagicc-white);
+	border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.sa-btn-outline:hover {
+	background-color: rgba(255, 255, 255, 0.2);
+}
+
+.sa-btn-card {
+	display: block;
+	width: 100%;
+	padding: 0.875rem 1.5rem;
+	background-color: #EFF6FF;
+	color: var(--sagicc-primary);
+	font-weight: 900;
+	text-align: center;
+	font-size: 0.875rem;
+	border-radius: 1rem;
+	text-decoration: none;
+	transition: all 0.2s ease;
+}
+
+.sa-btn-card:hover {
+	background-color: var(--sagicc-secondary);
+	color: var(--sagicc-white);
+}
+
+.sa-btn-card-solid {
+	display: block;
+	width: 100%;
+	padding: 0.875rem 1.5rem;
+	background-color: var(--sagicc-primary);
+	color: var(--sagicc-white);
+	font-weight: 900;
+	text-align: center;
+	font-size: 0.875rem;
+	border-radius: 1rem;
+	text-decoration: none;
+	transition: all 0.2s ease;
+}
+
+.sa-btn-card-solid:hover {
+	background-color: var(--sagicc-secondary);
+}
+
+/* ==========================================================================
+   Grid & Card Component
+   ========================================================================== */
+.sa-grid {
+	display: grid;
+	grid-template-columns: 1fr;
+	gap: 2rem;
+	font-family: var(--font-sans);
+}
+
+@media (min-width: 768px) {
+	.sa-grid {
+		grid-template-columns: repeat(2, 1fr);
+	}
+}
+
+@media (min-width: 1024px) {
+	.sa-grid {
+		grid-template-columns: repeat(3, 1fr);
+	}
+}
+
+.sa-card {
+	background-color: var(--sagicc-white);
+	border-radius: 1.5rem;
+	border: 1px solid var(--sagicc-gray-100);
+	box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
+	overflow: hidden;
+	display: flex;
+	flex-direction: column;
+	height: 100%;
+	transition: all 0.3s ease;
+}
+
+.sa-card:hover {
+	box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+	transform: translateY(-0.25rem);
+}
+
+.sa-card-media {
+	position: relative;
+	aspect-ratio: 16 / 9;
+	display: block;
+	overflow: hidden;
+	background-color: var(--sagicc-gray-100);
+}
+
+.sa-card-img {
+	object-fit: cover;
+	width: 100%;
+	height: 100%;
+	transition: transform 0.5s ease;
+}
+
+.sa-card-media:hover .sa-card-img {
+	transform: scale(1.05);
+}
+
+.sa-card-media-placeholder {
+	width: 100%;
+	height: 100%;
+	background-color: var(--sagicc-gray-50);
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	color: #CBD5E1;
+	font-size: 2.25rem;
+}
+
+.sa-card-body {
+	padding: 1.5rem;
+	flex: 1;
+	display: flex;
+	flex-direction: column;
+}
+
+.sa-card-title {
+	font-size: 1.25rem;
+	font-weight: 700;
+	color: var(--sagicc-secondary);
+	margin-bottom: 0.5rem;
+	transition: color 0.2s ease;
+}
+
+.sa-card-title a {
+	color: inherit;
+	text-decoration: none;
+}
+
+.sa-card-title a:hover {
+	color: var(--sagicc-primary);
+}
+
+.sa-card-excerpt {
+	color: var(--sagicc-gray-400);
+	font-size: 0.875rem;
+	font-weight: 500;
+	flex: 1;
+	margin-bottom: 1.5rem;
+}
+
+.sa-card-footer {
+	margin-top: auto;
+}
+
+.sa-card-header-meta {
+	display: flex;
+	align-items: center;
+	gap: 0.5rem;
+	margin-bottom: 1rem;
+}
+
+.sa-badge {
+	display: inline-block;
+	padding: 0.25rem 0.75rem;
+	background-color: #EFF6FF;
+	color: var(--sagicc-primary);
+	font-size: 0.6875rem;
+	font-weight: 900;
+	text-transform: uppercase;
+	letter-spacing: 0.05em;
+	border-radius: 9999px;
+}
+
+.sa-card-date {
+	font-size: 0.75rem;
+	color: var(--sagicc-gray-400);
+	font-weight: 500;
+}
