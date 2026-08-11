@@ -211,6 +211,18 @@ if ( function_exists( 'learndash_user_get_completed_courses' ) ) {
 	}
 }
 
+// Fallback: Contar mediante metadatos de usuario 'course_completed_*'
+if ( $completed_courses_count === 0 ) {
+	$all_user_meta = get_user_meta( $user_id );
+	if ( is_array( $all_user_meta ) ) {
+		foreach ( $all_user_meta as $meta_key => $meta_val ) {
+			if ( strpos( $meta_key, 'course_completed_' ) === 0 && ! empty( $meta_val[0] ) ) {
+				$completed_courses_count++;
+			}
+		}
+	}
+}
+
 $certificates_count = 0;
 $user_quizzes       = get_user_meta( $user_id, '_sfwd-quizzes', true );
 if ( is_array( $user_quizzes ) ) {
