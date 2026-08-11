@@ -123,17 +123,19 @@ $ideas_url = $t('dashboard.feature_ideas_url');
 
 // Obtener datos del usuario
 $is_logged_in = is_user_logged_in();
-$user_profile_url = $is_logged_in ? home_url('/profile/') : home_url('/login/');
-$user_title = $is_logged_in ? $t('dashboard.profile') : $t('auth.login');
 $user_avatar = '';
+$user_profile_url = home_url( ($lang === 'en' ? '/en' : '') . '/login/' );
 
 if ($is_logged_in) {
 	$current_user = wp_get_current_user();
+	$user_profile_url = home_url( ($lang === 'en' ? '/en' : '') . '/profile/' . $current_user->user_nicename . '/' );
 	$avatar_url = get_avatar_url($current_user->ID, array('size' => 32));
 	if ($avatar_url) {
 		$user_avatar = '<img src="' . esc_url($avatar_url) . '" class="sa-avatar-sm" />';
 	}
 }
+
+$user_title = $is_logged_in ? $t('dashboard.profile') : $t('auth.login');
 
 if (empty($user_avatar)) {
 	$icon = $is_logged_in ? 'fa-user-gear' : 'fa-user-lock';
