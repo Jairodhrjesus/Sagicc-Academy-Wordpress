@@ -664,3 +664,43 @@
 	justify-content: flex-end;
 }
 
+/* Strictly Disable Hover Transitions & Animations on Profile Cards */
+.sa-profile-wrapper .sa-card,
+.sa-profile-wrapper .sa-profile-card,
+.sa-profile-wrapper .sa-profile-header-card,
+.sa-profile-wrapper .sa-stat-card {
+	transition: none !important;
+	transform: none !important;
+}
+
+.sa-profile-wrapper .sa-card:hover,
+.sa-profile-wrapper .sa-profile-card:hover,
+.sa-profile-wrapper .sa-profile-header-card:hover,
+.sa-profile-wrapper .sa-stat-card:hover {
+	transform: none !important;
+	box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.03) !important;
+}
+
+/* Explicit High-Contrast Profile Action Buttons */
+.sa-profile-wrapper .sa-btn-secondary {
+	background-color: var(--sagicc-secondary, #0f172a) !important;
+	color: #ffffff !important;
+	padding: 0.75rem 1.75rem !important;
+	border-radius: 0.875rem !important;
+	font-weight: 800 !important;
+	font-size: 0.875rem !important;
+	border: 1px solid var(--sagicc-secondary, #0f172a) !important;
+	cursor: pointer !important;
+	display: inline-flex !important;
+	align-items: center !important;
+	justify-content: center !important;
+	box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1) !important;
+}
+
+.sa-profile-wrapper .sa-btn-secondary:hover {
+	background-color: #2463eb !important;
+	border-color: #2463eb !important;
+	color: #ffffff !important;
+}
+
+

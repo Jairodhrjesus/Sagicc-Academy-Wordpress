@@ -45,7 +45,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 			</div>
 
 			<div class="sa-form-actions">
-				<button type="submit" name="submit_profile_info" class="sa-btn sa-btn-primary">
+				<button type="submit" name="submit_profile_info" class="sa-btn sa-btn-secondary">
 					<i class="fa-solid fa-floppy-disk me-2"></i><?php echo esc_html( $p['t']( 'profile.save_info_btn' ) ); ?>
 				</button>
 			</div>

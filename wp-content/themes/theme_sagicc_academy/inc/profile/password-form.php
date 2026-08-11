@@ -43,7 +43,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 			</div>
 
 			<div class="sa-form-actions">
-				<button type="submit" name="submit_password" class="sa-btn sa-btn-outline">
+				<button type="submit" name="submit_password" class="sa-btn sa-btn-secondary">
 					<i class="fa-solid fa-key me-2"></i><?php echo esc_html( $p['t']( 'profile.update_btn' ) ); ?>
 				</button>
 			</div>
