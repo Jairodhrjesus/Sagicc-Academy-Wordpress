@@ -15,15 +15,67 @@
       "palette": [
         {
           "slug": "primary",
-          "color": "#111827",
+          "color": "#0052FF",
           "name": "Primary"
         },
         {
           "slug": "secondary",
-          "color": "#4b5563",
+          "color": "#0F172A",
           "name": "Secondary"
         }
       ]
     }
-  }
+  },
+  "customTemplates": [
+    {
+      "name": "page-login",
+      "title": "Login Page",
+      "postTypes": ["page"]
+    },
+    {
+      "name": "page-register",
+      "title": "Register Page",
+      "postTypes": ["page"]
+    },
+    {
+      "name": "page-profile",
+      "title": "Profile Page",
+      "postTypes": ["page"]
+    },
+    {
+      "name": "page-lostpassword",
+      "title": "Lost Password Page",
+      "postTypes": ["page"]
+    },
+    {
+      "name": "page-password-reset",
+      "title": "Password Reset Page",
+      "postTypes": ["page"]
+    },
+    {
+      "name": "page-registration-success",
+      "title": "Registration Success Page",
+      "postTypes": ["page"]
+    },
+    {
+      "name": "page-reset-password-success",
+      "title": "Password Reset Success Page",
+      "postTypes": ["page"]
+    },
+    {
+      "name": "page-videos",
+      "title": "Videos Page",
+      "postTypes": ["page"]
+    },
+    {
+      "name": "page-guides",
+      "title": "Guides Page",
+      "postTypes": ["page"]
+    },
+    {
+      "name": "page-certificates",
+      "title": "Certificates Page",
+      "postTypes": ["page"]
+    }
+  ]
 }
