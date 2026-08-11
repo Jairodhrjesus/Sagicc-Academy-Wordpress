@@ -39,3 +39,12 @@ add_filter( 'asl_query_args', function ( $args, $search_id ) {
 	$args['post_count'] = 6;
 	return $args;
 }, 99, 2 );
+
+// Suppress open_basedir restriction warnings triggered by third-party plugins in local environment
+set_error_handler( function ( $errno, $errstr ) {
+	if ( ( $errno === E_WARNING || $errno === E_USER_WARNING ) && strpos( $errstr, 'file_exists(): open_basedir restriction in effect' ) !== false ) {
+		return true; // Suppress warning gracefully
+	}
+	return false; // Pass all other errors to standard handler
+}, E_WARNING | E_USER_WARNING );
+

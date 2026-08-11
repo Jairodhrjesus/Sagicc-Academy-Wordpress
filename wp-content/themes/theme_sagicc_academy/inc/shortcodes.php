@@ -233,10 +233,14 @@ add_shortcode( 'sagicc_guias_list', function() {
 		'es' => array(
 			'no_guides' => 'No hay guías disponibles.',
 			'view_guide' => 'Ver guía',
+			'view_list'  => 'Lista',
+			'view_grid'  => 'Cuadrícula',
 		),
 		'en' => array(
-			'no_guides' => 'No guides available.',
+			'no_guides'  => 'No guides available.',
 			'view_guide' => 'Read guide',
+			'view_list'  => 'List',
+			'view_grid'  => 'Grid',
 		)
 	);
 
@@ -256,7 +260,20 @@ add_shortcode( 'sagicc_guias_list', function() {
 
 	ob_start();
 	?>
-	<div class="sa-grid">
+	<div class="sa-view-switcher">
+		<div class="sa-view-toggle-group" role="group" aria-label="Cambiar vista">
+			<button type="button" class="sa-view-toggle-btn active" data-view="list" title="<?php echo esc_attr( $t('view_list') ); ?>">
+				<i class="fa-solid fa-list"></i>
+				<span><?php echo esc_html( $t('view_list') ); ?></span>
+			</button>
+			<button type="button" class="sa-view-toggle-btn" data-view="grid" title="<?php echo esc_attr( $t('view_grid') ); ?>">
+				<i class="fa-solid fa-border-all"></i>
+				<span><?php echo esc_html( $t('view_grid') ); ?></span>
+			</button>
+		</div>
+	</div>
+
+	<div id="sa-guias-container" class="sa-view-container sa-view-list">
 		<?php while ( $guias_query->have_posts() ) : $guias_query->the_post(); 
 			$guia_id = get_the_ID();
 			$permalink = get_permalink();
@@ -279,7 +296,7 @@ add_shortcode( 'sagicc_guias_list', function() {
 						</a>
 					</h3>
 					<div class="sa-card-excerpt">
-						<?php echo wp_trim_words( get_the_excerpt(), 18 ); ?>
+						<?php echo wp_trim_words( get_the_excerpt(), 25 ); ?>
 					</div>
 					<div class="sa-card-footer">
 						<a href="<?php echo esc_url( $permalink ); ?>" class="sa-btn-card">
@@ -290,6 +307,30 @@ add_shortcode( 'sagicc_guias_list', function() {
 			</article>
 		<?php endwhile; wp_reset_postdata(); ?>
 	</div>
+
+	<script>
+	document.addEventListener('DOMContentLoaded', function() {
+		const toggleBtns = document.querySelectorAll('.sa-view-toggle-btn');
+		const container = document.getElementById('sa-guias-container');
+		if (!container || !toggleBtns.length) return;
+
+		toggleBtns.forEach(btn => {
+			btn.addEventListener('click', function() {
+				const view = this.getAttribute('data-view');
+				toggleBtns.forEach(b => b.classList.remove('active'));
+				this.classList.add('active');
+				
+				if (view === 'grid') {
+					container.classList.remove('sa-view-list');
+					container.classList.add('sa-view-grid');
+				} else {
+					container.classList.remove('sa-view-grid');
+					container.classList.add('sa-view-list');
+				}
+			});
+		});
+	});
+	</script>
 	<?php
 	return ob_get_clean();
 } );

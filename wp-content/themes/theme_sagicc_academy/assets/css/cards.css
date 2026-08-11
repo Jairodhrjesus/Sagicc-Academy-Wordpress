@@ -216,3 +216,114 @@
 	color: var(--sagicc-gray-400);
 	font-weight: 500;
 }
+
+/* ==========================================================================
+   View Switcher & Layout Toggle (List vs Grid)
+   ========================================================================== */
+.sa-view-switcher {
+	display: flex;
+	justify-content: flex-end;
+	margin-bottom: 1.5rem;
+}
+
+.sa-view-toggle-group {
+	display: inline-flex;
+	align-items: center;
+	gap: 0.25rem;
+	background-color: var(--sagicc-gray-100, #F1F5F9);
+	padding: 0.25rem;
+	border-radius: 0.75rem;
+	border: 1px solid rgba(226, 232, 240, 0.8);
+}
+
+.sa-view-toggle-btn {
+	display: inline-flex;
+	align-items: center;
+	gap: 0.5rem;
+	padding: 0.5rem 1rem;
+	border-radius: 0.5rem;
+	font-size: 0.875rem;
+	font-weight: 600;
+	color: var(--sagicc-gray-400, #64748B);
+	background: transparent;
+	border: none;
+	cursor: pointer;
+	transition: all 0.2s ease;
+	font-family: var(--font-sans);
+}
+
+.sa-view-toggle-btn:hover {
+	color: var(--sagicc-secondary);
+}
+
+.sa-view-toggle-btn.active {
+	background-color: var(--sagicc-white, #FFFFFF);
+	color: var(--sagicc-primary);
+	font-weight: 700;
+	box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+}
+
+/* Grid Layout */
+.sa-view-grid {
+	display: grid;
+	grid-template-columns: 1fr;
+	gap: 2rem;
+	font-family: var(--font-sans);
+}
+
+@media (min-width: 768px) {
+	.sa-view-grid {
+		grid-template-columns: repeat(2, 1fr);
+	}
+}
+
+@media (min-width: 1024px) {
+	.sa-view-grid {
+		grid-template-columns: repeat(3, 1fr);
+	}
+}
+
+/* List Layout (Default for Guias) */
+.sa-view-list {
+	display: flex;
+	flex-direction: column;
+	gap: 1.25rem;
+	font-family: var(--font-sans);
+}
+
+.sa-view-list .sa-card {
+	flex-direction: column;
+}
+
+@media (min-width: 640px) {
+	.sa-view-list .sa-card {
+		flex-direction: row;
+		align-items: stretch;
+	}
+
+	.sa-view-list .sa-card-media {
+		width: 240px;
+		min-width: 240px;
+		max-width: 240px;
+		height: auto;
+		aspect-ratio: 16 / 9;
+	}
+
+	.sa-view-list .sa-card-body {
+		padding: 1.5rem 1.75rem;
+		display: flex;
+		flex-direction: column;
+		justify-content: space-between;
+	}
+
+	.sa-view-list .sa-card-footer {
+		margin-top: 1rem;
+		align-self: flex-start;
+	}
+
+	.sa-view-list .sa-btn-card {
+		width: auto;
+		padding: 0.625rem 1.5rem;
+	}
+}
+
