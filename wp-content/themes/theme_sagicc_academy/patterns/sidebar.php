@@ -145,6 +145,22 @@ if (empty($user_avatar)) {
 $theme_uri = get_stylesheet_directory_uri();
 ?>
 
+<!-- MOBILE TOPBAR -->
+<div class="sa-mobile-topbar">
+	<button id="sa-mobile-toggle-btn" type="button" class="sa-mobile-toggle-btn" aria-label="Abrir Menú">
+		<i class="fa-solid fa-bars"></i>
+	</button>
+	<a href="<?php echo esc_url($dashboard_url); ?>" class="sa-mobile-logo-link">
+		<img src="<?php echo esc_url($theme_uri . '/assets/Sagicc-Academy-Logo.svg'); ?>" alt="Sagicc Academy" class="sa-mobile-logo" />
+	</a>
+	<a href="<?php echo esc_url($user_profile_url); ?>" class="sa-mobile-user-link" title="<?php echo esc_attr($user_title); ?>">
+		<?php echo $user_avatar; ?>
+	</a>
+</div>
+
+<!-- MOBILE BACKDROP OVERLAY -->
+<div id="sa-sidebar-backdrop" class="sa-sidebar-backdrop"></div>
+
 <aside id="sidebar" class="sa-sidebar">
 	<div class="sa-sidebar-wrapper">
 		<!-- LOGO SECTION -->
@@ -153,6 +169,9 @@ $theme_uri = get_stylesheet_directory_uri();
 				<img src="<?php echo esc_url($theme_uri . '/assets/Sagicc-Academy-Logo.svg'); ?>" alt="Sagicc Academy" class="sa-sidebar-logo full-logo" />
 				<img src="<?php echo esc_url($theme_uri . '/assets/isotipo-sagicc-academy.svg'); ?>" alt="Sagicc Academy" class="sa-sidebar-logo isotype-logo sa-hidden" />
 			</a>
+			<button id="sa-mobile-close-btn" type="button" class="sa-mobile-close-btn" aria-label="Cerrar Menú">
+				<i class="fa-solid fa-xmark"></i>
+			</button>
 		</div>
 
 		<div id="sidebar-content" class="sa-sidebar-content scrollbar-hide">
@@ -414,8 +433,49 @@ $theme_uri = get_stylesheet_directory_uri();
 			});
 		}
 
+		function setupMobileSidebar() {
+			const mobileToggle = document.getElementById("sa-mobile-toggle-btn");
+			const mobileClose = document.getElementById("sa-mobile-close-btn");
+			const sidebar = document.getElementById("sidebar");
+			const backdrop = document.getElementById("sa-sidebar-backdrop");
+			const navLinks = sidebar?.querySelectorAll(".sa-sidebar-link");
+
+			if (!sidebar) return;
+
+			const openMobileSidebar = () => {
+				sidebar.classList.add("sa-mobile-open");
+				backdrop?.classList.add("active");
+				document.body.style.overflow = "hidden";
+			};
+
+			const closeMobileSidebar = () => {
+				sidebar.classList.remove("sa-mobile-open");
+				backdrop?.classList.remove("active");
+				document.body.style.overflow = "";
+			};
+
+			mobileToggle?.addEventListener("click", openMobileSidebar);
+			mobileClose?.addEventListener("click", closeMobileSidebar);
+			backdrop?.addEventListener("click", closeMobileSidebar);
+
+			navLinks?.forEach((link) => {
+				link.addEventListener("click", () => {
+					if (window.innerWidth < 1024) {
+						closeMobileSidebar();
+					}
+				});
+			});
+
+			window.addEventListener("resize", () => {
+				if (window.innerWidth >= 1024) {
+					closeMobileSidebar();
+				}
+			});
+		}
+
 		document.addEventListener("DOMContentLoaded", () => {
 			setupSidebar();
+			setupMobileSidebar();
 			setupLanguageSwitchers();
 			document.addEventListener("click", () => {
 				document.querySelectorAll(".sa-lang-dropdown").forEach((d) => d.classList.add("sa-hidden"));

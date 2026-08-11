@@ -47,9 +47,16 @@ body {
 /* App Layout Grid */
 .sa-layout {
 	display: flex;
+	flex-direction: column;
 	min-height: 100vh;
 	background-color: var(--sagicc-white);
 	color: var(--sagicc-gray-900);
+}
+
+@media (min-width: 1024px) {
+	.sa-layout {
+		flex-direction: row;
+	}
 }
 
 .sa-main {
