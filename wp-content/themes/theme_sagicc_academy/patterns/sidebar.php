@@ -103,16 +103,18 @@ $lang_home = function_exists('pll_home_url') ? pll_home_url($lang) : home_url($l
 
 $dashboard_url = $lang_home;
 
-$courses_archive = get_post_type_archive_link('sfwd-courses');
-$courses_url = $courses_archive ? $courses_archive : home_url( ($lang === 'en' ? '/en' : '') . '/courses/' );
+$lang_prefix = ($lang === 'en') ? '/en' : '';
 
-$routes_url = home_url( ($lang === 'en' ? '/en' : '') . '/routes/' );
+$courses_archive = get_post_type_archive_link('sfwd-courses');
+$courses_url = ($lang === 'en' && strpos($courses_archive, '/en/') === false) ? home_url('/en/courses/') : ($courses_archive ? $courses_archive : home_url( $lang_prefix . '/courses/' ));
+
+$routes_url = home_url( $lang_prefix . '/routes/' );
 
 $videos_archive = get_post_type_archive_link('video');
-$videos_url = $videos_archive ? $videos_archive : home_url( ($lang === 'en' ? '/en' : '') . '/video/' );
+$videos_url = ($lang === 'en' && strpos($videos_archive, '/en/') === false) ? home_url('/en/video/') : ($videos_archive ? $videos_archive : home_url( $lang_prefix . '/video/' ));
 
 $guides_archive = get_post_type_archive_link('guia');
-$guides_url = $guides_archive ? $guides_archive : home_url( ($lang === 'en' ? '/en' : '') . '/guia/' );
+$guides_url = ($lang === 'en' && strpos($guides_archive, '/en/') === false) ? home_url('/en/guia/') : ($guides_archive ? $guides_archive : home_url( $lang_prefix . '/guia/' ));
 
 $docs_url = 'https://technisupport.atlassian.net/wiki/spaces/S2MDU/overview';
 $interactive_url = '#';

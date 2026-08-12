@@ -10,14 +10,34 @@ if ( ! defined( 'ABSPATH' ) ) {
 }
 
 add_shortcode( 'sagicc_courses_list', function () {
+	$lang = function_exists( 'pll_current_language' ) ? pll_current_language() : ( isset( $_COOKIE['lang'] ) && in_array( $_COOKIE['lang'], array( 'es', 'en' ) ) ? $_COOKIE['lang'] : 'es' );
+
+	$translations = array(
+		'es' => array(
+			'no_courses'    => 'No hay cursos disponibles.',
+			'continue_course' => 'Continuar curso',
+			'view_course'   => 'Ver curso',
+		),
+		'en' => array(
+			'no_courses'    => 'No courses available.',
+			'continue_course' => 'Continue course',
+			'view_course'   => 'View course',
+		)
+	);
+
+	$t = function ( $key ) use ( $translations, $lang ) {
+		return isset( $translations[ $lang ][ $key ] ) ? $translations[ $lang ][ $key ] : $key;
+	};
+
 	$courses_query = new WP_Query( array(
 		'post_type'      => 'sfwd-courses',
 		'posts_per_page' => -1,
 		'post_status'    => 'publish',
+		'lang'           => $lang,
 	) );
 
 	if ( ! $courses_query->have_posts() ) {
-		return '<p class="text-gray-400 font-medium text-base font-sans">' . esc_html__( 'No hay cursos disponibles.', 'theme-sagicc-academy' ) . '</p>';
+		return '<p class="text-gray-400 font-medium text-base font-sans">' . esc_html( $t( 'no_courses' ) ) . '</p>';
 	}
 
 	ob_start();
@@ -50,7 +70,7 @@ add_shortcode( 'sagicc_courses_list', function () {
 					</div>
 					<div class="sa-card-footer">
 						<a href="<?php echo esc_url( $permalink ); ?>" class="sa-btn-card">
-							<?php echo $has_access ? esc_html__( 'Continuar curso', 'theme-sagicc-academy' ) : esc_html__( 'Ver curso', 'theme-sagicc-academy' ); ?>
+							<?php echo $has_access ? esc_html( $t( 'continue_course' ) ) : esc_html( $t( 'view_course' ) ); ?>
 						</a>
 					</div>
 				</div>

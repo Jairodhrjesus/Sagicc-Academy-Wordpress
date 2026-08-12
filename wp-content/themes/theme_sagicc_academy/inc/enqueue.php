@@ -25,6 +25,9 @@ function theme_sagicc_academy_scripts() {
 
 	// Theme style.css
 	wp_enqueue_style( 'theme-sagicc-academy-style', get_stylesheet_uri(), array( 'theme-sagicc-academy-main' ), $theme_version );
+
+	// GSAP for smooth animations
+	wp_enqueue_script( 'gsap', 'https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js', array(), '3.12.5', true );
 }
 add_action( 'wp_enqueue_scripts', 'theme_sagicc_academy_scripts' );
 

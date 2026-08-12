@@ -10,7 +10,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 }
 
 add_shortcode( 'sagicc_home_header', function () {
-	$lang = isset( $_COOKIE['lang'] ) && in_array( $_COOKIE['lang'], array( 'es', 'en' ) ) ? $_COOKIE['lang'] : 'es';
+	$lang = function_exists( 'pll_current_language' ) ? pll_current_language() : ( isset( $_COOKIE['lang'] ) && in_array( $_COOKIE['lang'], array( 'es', 'en' ) ) ? $_COOKIE['lang'] : 'es' );
 
 	$translations = array(
 		'es' => array(
@@ -42,6 +42,10 @@ add_shortcode( 'sagicc_home_header', function () {
 
 	if ( ! $is_logged_in ) : ?>
 		<header class="sa-hero">
+			<div class="sa-hero-dots-container">
+				<div class="sa-hero-dots"></div>
+			</div>
+
 			<div class="sa-hero-content">
 				<span class="sa-hero-badge">
 					<?php echo esc_html( $t( 'home.welcome_badge' ) ); ?>
@@ -65,6 +69,54 @@ add_shortcode( 'sagicc_home_header', function () {
 			<div class="sa-hero-bg-glow-1"></div>
 			<div class="sa-hero-bg-glow-2"></div>
 		</header>
+
+		<script>
+		(function() {
+			function initHeroDotsGsap() {
+				const hero = document.querySelector('.sa-hero');
+				const dots = document.querySelector('.sa-hero-dots');
+				if (!hero || !dots) return;
+
+				let bounds = hero.getBoundingClientRect();
+				window.addEventListener('resize', () => {
+					bounds = hero.getBoundingClientRect();
+				});
+
+				hero.addEventListener('mousemove', (e) => {
+					if (typeof gsap === 'undefined') return;
+					const relX = (e.clientX - bounds.left) / bounds.width - 0.5;
+					const relY = (e.clientY - bounds.top) / bounds.height - 0.5;
+
+					gsap.to(dots, {
+						x: relX * 45,
+						y: relY * 35,
+						rotation: relX * 1.5,
+						duration: 0.6,
+						ease: 'power2.out',
+						overwrite: 'auto'
+					});
+				});
+
+				hero.addEventListener('mouseleave', () => {
+					if (typeof gsap === 'undefined') return;
+					gsap.to(dots, {
+						x: 0,
+						y: 0,
+						rotation: 0,
+						duration: 1,
+						ease: 'power3.out',
+						overwrite: 'auto'
+					});
+				});
+			}
+
+			if (document.readyState === 'loading') {
+				document.addEventListener('DOMContentLoaded', initHeroDotsGsap);
+			} else {
+				initHeroDotsGsap();
+			}
+		})();
+		</script>
 	<?php else :
 		$current_user = wp_get_current_user();
 		$first_name   = $current_user->user_firstname;
@@ -90,7 +142,11 @@ add_shortcode( 'sagicc_archive_header', function ( $atts ) {
 		'post_type' => 'post',
 	), $atts );
 
-	$lang = isset( $_COOKIE['lang'] ) && in_array( $_COOKIE['lang'], array( 'es', 'en' ) ) ? $_COOKIE['lang'] : 'es';
+	if ( ! is_user_logged_in() && $atts['post_type'] === 'certificate' ) {
+		return '';
+	}
+
+	$lang = function_exists( 'pll_current_language' ) ? pll_current_language() : ( isset( $_COOKIE['lang'] ) && in_array( $_COOKIE['lang'], array( 'es', 'en' ) ) ? $_COOKIE['lang'] : 'es' );
 
 	$translations = array(
 		'video'       => array(

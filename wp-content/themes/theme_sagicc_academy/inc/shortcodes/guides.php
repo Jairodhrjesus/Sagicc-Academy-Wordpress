@@ -35,6 +35,7 @@ add_shortcode( 'sagicc_guias_list', function () {
 		'post_type'      => 'guia',
 		'posts_per_page' => -1,
 		'post_status'    => 'publish',
+		'lang'           => $lang,
 	) );
 
 	if ( ! $guias_query->have_posts() ) {

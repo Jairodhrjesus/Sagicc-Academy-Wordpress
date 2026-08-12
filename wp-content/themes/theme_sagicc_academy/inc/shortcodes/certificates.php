@@ -10,10 +10,14 @@ if (!defined('ABSPATH')) {
 }
 
 add_shortcode('sagicc_certificates_list', function () {
-	$lang = isset($_COOKIE['lang']) && in_array($_COOKIE['lang'], array('es', 'en')) ? $_COOKIE['lang'] : 'es';
+	$lang = function_exists('pll_current_language') ? pll_current_language() : (isset($_COOKIE['lang']) && in_array($_COOKIE['lang'], array('es', 'en')) ? $_COOKIE['lang'] : 'es');
 
 	$translations = array(
 		'es' => array(
+			'no_login_title' => 'Inicia sesión en tu cuenta',
+			'no_login_desc' => 'Debes iniciar sesión para ver tus certificados obtenidos e inscribirte a nuevos cursos en Sagicc Academy.',
+			'login_btn' => 'Iniciar Sesión',
+			'courses_btn' => 'Explorar Cursos',
 			'no_login' => 'Debes iniciar sesión para ver tus certificados.',
 			'no_certificates' => 'Aún no tienes certificados disponibles.',
 			'download' => 'Descargar Certificado',
@@ -23,6 +27,10 @@ add_shortcode('sagicc_certificates_list', function () {
 			'no_cert_course' => 'Este curso no tiene certificado',
 		),
 		'en' => array(
+			'no_login_title' => 'Sign in to your account',
+			'no_login_desc' => 'You must log in to view your certificates and enroll in new courses at Sagicc Academy.',
+			'login_btn' => 'Log In',
+			'courses_btn' => 'Explore Courses',
 			'no_login' => 'You must log in to view your certificates.',
 			'no_certificates' => 'You do not have any certificates available yet.',
 			'download' => 'Download Certificate',
@@ -38,7 +46,33 @@ add_shortcode('sagicc_certificates_list', function () {
 	};
 
 	if (!is_user_logged_in()) {
-		return '<p class="text-gray-400 font-medium text-base font-sans">' . esc_html($t('no_login')) . '</p>';
+		$login_url = home_url(($lang === 'en' ? '/en' : '') . '/login/');
+		$courses_archive = get_post_type_archive_link('sfwd-courses');
+		$courses_url = $courses_archive ? $courses_archive : home_url(($lang === 'en' ? '/en' : '') . '/courses/');
+
+		ob_start();
+		?>
+		<div class="sa-auth-required-wrapper">
+			<div class="sa-auth-required-card">
+				<div class="sa-auth-required-icon">
+					<i class="fa-solid fa-user-lock"></i>
+				</div>
+				<h2 class="sa-auth-required-title"><?php echo esc_html($t('no_login_title')); ?></h2>
+				<p class="sa-auth-required-desc"><?php echo esc_html($t('no_login_desc')); ?></p>
+				<div class="sa-auth-required-actions">
+					<a href="<?php echo esc_url($login_url); ?>" class="sa-btn-card-solid">
+						<i class="fa-solid fa-right-to-bracket"></i>
+						<?php echo esc_html($t('login_btn')); ?>
+					</a>
+					<a href="<?php echo esc_url($courses_url); ?>" class="sa-btn-card">
+						<i class="fa-solid fa-graduation-cap"></i>
+						<?php echo esc_html($t('courses_btn')); ?>
+					</a>
+				</div>
+			</div>
+		</div>
+		<?php
+		return ob_get_clean();
 	}
 
 	$user_id = get_current_user_id();

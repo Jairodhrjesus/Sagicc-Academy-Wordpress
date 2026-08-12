@@ -10,7 +10,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 }
 
 add_shortcode( 'sagicc_videos_list', function () {
-	$lang = isset( $_COOKIE['lang'] ) && in_array( $_COOKIE['lang'], array( 'es', 'en' ) ) ? $_COOKIE['lang'] : 'es';
+	$lang = function_exists( 'pll_current_language' ) ? pll_current_language() : ( isset( $_COOKIE['lang'] ) && in_array( $_COOKIE['lang'], array( 'es', 'en' ) ) ? $_COOKIE['lang'] : 'es' );
 
 	$translations = array(
 		'es' => array(
@@ -31,6 +31,7 @@ add_shortcode( 'sagicc_videos_list', function () {
 		'post_type'      => 'video',
 		'posts_per_page' => -1,
 		'post_status'    => 'publish',
+		'lang'           => $lang,
 	) );
 
 	if ( ! $videos_query->have_posts() ) {
